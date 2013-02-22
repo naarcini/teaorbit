@@ -3,12 +3,18 @@
 	<head>
 		<title>tea orbit</title>
 		<script type='text/javascript' src='{{ STATIC_URL }}scripts/jquery.min.js'></script>
+		<script type='text/javascript' src='{{ STATIC_URL }}scripts/jquery.timeago.min.js'></script>
 		<script type='text/javascript' src='{{ STATIC_URL }}scripts/modernizr.min.js'></script>
+		<script type='text/javascript' src='{{ STATIC_URL }}scripts/basics.js'></script>
 		<script type='text/javascript'>
-            var timestamp = '{{ timestamp }}';
-            var latitude = null;
-            var longitude = null;
-            var accuracy = null;
+            window.urls = {
+                'messages': '{% url messages %}',
+            }
+
+            window.last_fetched = 0;
+            window.latitude = null;
+            window.longitude = null;
+            window.gps_accuracy = null;
 
             function scroll() {
                 $(document).scrollTop($(document).height());
@@ -16,30 +22,42 @@
 
             function init() {
                 navigator.geolocation.getCurrentPosition(function(position){
-                    latitude = position.coords.latitude;
-                    longitude = position.coords.longitude;
-                    accuracy = position.coords.accuracy;
+                    window.latitude = position.coords.latitude;
+                    window.longitude = position.coords.longitude;
+                    window.gps_accuracy = position.coords.accuracy;
 
                     $('#post input[type="text"]').prop('disabled', false);
                     get_messages();
                 });
             }
             function get_messages() {
-                $.get(
-                    "{% url messages %}",
+                var postdata = {
+                    latitude: window.latitude,
+                    longitude: window.longitude,
+                    last_fetched: window.last_fetched,
+                };
+                $.post(
+                    window.urls.messages,
+                    postdata,
                     function(response) {
+                        window.last_fetched = response.timestamp;
+                        $('#loading').hide();
                         var chat = $('#chat .inner');
-                        chat.html('');
                         for(var i=0; i<response.messages.length; i++) {
                             var row = $('<div>').addClass('row');
+                            var date = new Date(response.messages[i].date*1000);
+                            var datestring = date.toLocaleString()
                             row.append( $('<div>').addClass('message').html(response.messages[i].message) );
-                            row.append( $('<div>').addClass('date').html(response.messages[i].date) );
+                            row.append( $('<div>').addClass('date').attr('title', datestring).html(response.messages[i].date) );
                             chat.append(row);
+                            $('.date').timeago();
                         }
                         scroll();
                     },
                     'json'
-                );
+                ).error(function(error){
+                    
+                });
             }
             
 			$(document).ready(function(){
@@ -49,6 +67,10 @@
 
                 $('#post form').on('submit', function(e){
                     e.preventDefault();
+                    var latitude = window.latitude;
+                    var longitude = window.longitude;
+                    var accuracy = window.gps_accuracy;
+                    
                     if(!latitude || !longitude) {
                         alert("No location data.");
                     } else if(accuracy > 200) {
@@ -106,7 +128,7 @@
 			</div>
 			<div id='chat'>
 				<div class='inner'>
-                    loading...
+                    <div id='loading'>loading...</div>
                 </div>
 			</div>
             <div id='post'>
@@ -115,6 +137,7 @@
                     <form action='{% url post %}'>
                         <input type='hidden' name='latitude' value='0' />
                         <input type='hidden' name='longitude' value='0' />
+                        <input type='hidden' name='last_fetched' value='0' />
                         <input type='text' name='message' disabled='disabled' placeholder='Type your message' />
                     </form>
                 </div>

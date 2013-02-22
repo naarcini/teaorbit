@@ -3,6 +3,8 @@ from django.template import RequestContext
 from django.shortcuts import render_to_response
 from django.core.urlresolvers import reverse
 import django.utils.simplejson as json
+from datetime import datetime
+import calendar
 
 def template_response(template, data, request):
     return HttpResponse(render_to_response(template, data, context_instance=RequestContext(request)))
@@ -21,3 +23,10 @@ def redirect(url=None, label=None, args=None, kwargs=None):
 		
 def not_found():
 	raise Http404
+
+def datetime_to_unix(date):
+    return calendar.timegm(date.utctimetuple())
+
+def now():
+    # return UTC Unix timestamp
+    return datetime_to_unix(datetime.utcnow())
