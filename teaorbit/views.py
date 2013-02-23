@@ -29,18 +29,15 @@ def messages(request):
         latitude = request.POST['latitude']
         longitude = request.POST['longitude']
 
-        last_fetched = float(request.POST.get('last_fetched', '0'))
-        last_fetched_date = datetime.fromtimestamp(last_fetched)
-
-        messages = Message.objects.filter(date__gt=last_fetched_date)
+        last_id = float(request.POST.get('last_id', '0'))
+        messages = Message.objects.filter(id__gt=last_id)
 
         response = {
             'messages': [ {
                 'id': message.id,
                 'message': message.message,
                 'date': datetime_to_unix(message.date)
-            } for message in messages ],
-            'timestamp': datetime_to_unix(date),
+            } for message in messages ]
         }
 
     return json_response(response)
