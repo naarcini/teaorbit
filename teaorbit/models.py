@@ -3,6 +3,7 @@ import datetime
 
 class Message(models.Model):
     id = models.AutoField(primary_key=True)
+    name = models.CharField(max_length=100, null=True)
     message = models.TextField()
     latitude = models.FloatField()
     longitude = models.FloatField()

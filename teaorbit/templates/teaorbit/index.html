@@ -48,12 +48,22 @@
                             var row = $('<div>').addClass('row');
                             var date = new Date(response.messages[i].date*1000);
                             var datestring = date.toLocaleString()
-                            row.append( $('<div>').addClass('message').html(response.messages[i].message) );
+                            var message;
+                            if(response.messages[i].name) {
+                                message = "<span class='name'>" + response.messages[i].name + "</span> " + response.messages[i].message;
+                            } else {
+                                message = response.messages[i].message;
+                            }
+                            row.append( $('<div>').addClass('message').html(message) );
                             row.append( $('<div>').addClass('date').attr('title', datestring).html(response.messages[i].date) );
                             chat.append(row);
                             $('.date').timeago();
                         }
-                        window.last_id = response.messages[response.messages.length-1].id;
+                        if(response.messages.length > 0) {
+                            window.last_id = response.messages[response.messages.length-1].id;
+                        } else {
+                            window.last_id = 0;
+                        }
                         scroll();
                     },
                     'json'
@@ -81,7 +91,7 @@
                         $(this).find('input[name="longitude"]').val(longitude);
                         var formdata = $(this).serialize();
 
-                        $(this).find('input').val('');
+                        $(this).find('input[name="message"]').val('');
                         
                         $.post(
                             $(this).attr('action'),
@@ -112,13 +122,20 @@
 
             #post { position: fixed; bottom: 0; left: 0; background: #000; width: 100%; }
             #post .inner { margin: 20px; position: relative; }
-            #post input { background: #444; border: 1px solid #aaa; line-height: 20px; color: #fff; width: 100%; border-radius: 2px; text-indent: 5px; }
-            
+            #post input { background: #444; border: 1px solid #aaa; line-height: 20px; color: #fff; border-radius: 2px; text-indent: 5px; padding: 3px; }
+
+            input#type-here { width: 60% }
+            input#name { width: 20%; }
+            input#submit { padding-right: 8px; }
+
             #chat { }
             #chat .inner { padding: 30px; }
             #chat .message { background: rgba(255,255,255,0.1); padding: 5px 10px; border-radius: 3px; display: inline-block; margin: 2px 0; }
             #chat .date { display: inline-block; color: #444; font-size: 12px; margin-left: 5px; }
             #chat .row:hover .date { color: #aaa; }
+            #chat .name { color: #888; }
+            #chat .name:before { content: "[" }
+            #chat .name:after { content: "] " }
         </style>
 	</head>
 	<body>
@@ -134,12 +151,13 @@
 			</div>
             <div id='post'>
                 <div class='inner'>
-                    optional: <a href='#'>Pick a name</a>
                     <form action='{% url post %}'>
+                        <input type='text' name='name' id='name' placeholder='Name (optional)' />
                         <input type='hidden' name='latitude' value='0' />
                         <input type='hidden' name='longitude' value='0' />
                         <input type='hidden' name='last_id' value='0' />
                         <input type='text' name='message' disabled='disabled' id='type-here' placeholder='Type your message' />
+                        <input type='submit' value='Send' id='submit' />
                     </form>
                 </div>
             </div>

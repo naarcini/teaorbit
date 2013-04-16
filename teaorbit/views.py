@@ -35,6 +35,7 @@ def messages(request):
         response = {
             'messages': [ {
                 'id': message.id,
+                'name': message.name,
                 'message': message.message,
                 'date': datetime_to_unix(message.date)
             } for message in messages ]
@@ -46,6 +47,7 @@ def post(request):
 
     message = Message(
         message=request.POST['message'].strip(),
+        name=request.POST['name'].strip(),
         latitude=float(request.POST['latitude']),
         longitude=float(request.POST['longitude']),
         ip=request.META['REMOTE_ADDR'],
