@@ -50,9 +50,9 @@
                             var datestring = date.toLocaleString()
                             var message;
                             if(response.messages[i].name) {
-                                message = "<span class='name'>" + response.messages[i].name + "</span> " + response.messages[i].message;
+                                message = "<span class='name'>" + escapeHtml(response.messages[i].name) + "</span> " + escapeHtml(response.messages[i].message);
                             } else {
-                                message = response.messages[i].message;
+                                message = escapeHtml(response.messages[i].message);
                             }
                             row.append( $('<div>').addClass('message').html(message) );
                             row.append( $('<div>').addClass('date').attr('title', datestring).html(response.messages[i].date) );
@@ -141,7 +141,7 @@
 	<body>
 		<div id='container'>
             <div id='header'>
-                <div class='about'>you are seeing anonymous posts from everyone.</div>
+                <div class='about'>you are seeing posts from everyone.</div>
                 <h1><a href='{% url index %}'>tea orbit</a></h1>
 			</div>
 			<div id='chat'>

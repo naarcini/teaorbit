@@ -9,3 +9,12 @@ if (!Date.prototype.toISOString) {
             + pad(this.getUTCSeconds()) + 'Z';
     };
 }
+
+function escapeHtml(unsafe) {
+    return unsafe
+         .replace(/&/g, "&amp;")
+         .replace(/</g, "&lt;")
+         .replace(/>/g, "&gt;")
+         .replace(/"/g, "&quot;")
+         .replace(/'/g, "&#039;");
+ }
