@@ -1,0 +1,188 @@
+<!DOCTYPE HTML>
+<html>
+    <head>
+        <title>
+            Wear a Hat!
+        </title>
+        <script type="text/javascript" charset="utf-8" src="../site_media/scripts/jquery-1.9.1.min.js"></script>
+        <!--<script type="text/javascript" charset="utf-8" src="../site_media/scripts/animations.js"></script>-->
+        <script type="text/javascript">
+            var canvas, ctx, moveID, max_height, max_width, your_dude, other_dudes;
+            $(document).ready( function () {
+                canvas = Canvas($('#hatGame'));
+                ctx = canvas.getContext('2d');
+                max_width = ctx.width;
+                max_height = ctx.height;
+                var img = new Image()
+                img.src = '../site_media/images/HAT_Background.png';
+                var CanvasXSize = 800;
+                var CanvasYSize = 200;
+                var speed = 30; //lower is faster
+                var scale = 1.05;
+                var y = -4.5; //vertical offset
+                //End User Variables
+                 
+                var dx = 0.75;
+                var imgW;
+                var imgH;
+                var x = 0;
+                var clearX;
+                var clearY;
+                var ctx;
+                 
+                img.onload = function() {
+                    imgW = img.width*scale;
+                    imgH = img.height*scale;
+                    if (imgW > CanvasXSize) { x = CanvasXSize-imgW; } // image larger than canvas
+                    if (imgW > CanvasXSize) { clearX = imgW; } // image larger than canvas
+                    else { clearX = CanvasXSize; }
+                    if (imgH > CanvasYSize) { clearY = imgH; } // image larger than canvas
+                    else { clearY = CanvasYSize; }
+                    //Get Canvas Element
+                    ctx = document.getElementById('canvas').getContext('2d');
+                    //Set Refresh Rate
+                    return setInterval(draw, speed);
+                }
+                 
+                function draw() {
+                    
+                }
+/*
+                // Dude initialization
+                your_dude = dude(250, 250, 5, 15);
+                moveID = window.setInterval( your_dude('move', ctx, width, height), 100 );
+
+                $('body').on('keydown', function(e) {
+                    var code = e.keyCode || e.which;
+                    your_dude('move_start', code);
+
+                    if( code == 37 ) {
+                        // Left
+                        dx = -move_speed;
+                    }
+                    else if( code == 38 ) {
+                        // Up
+                        dy = -move_speed;
+                    }
+                    else if( code == 39 ) {
+                        // Right
+                        dx = move_speed;
+                    }
+                    else if( code == 40 ) {
+                        // Down
+                        dy = move_speed;
+                    }
+                    
+                });
+
+                $('body').on('keyup', function(e) {
+                    var code = e.keyCode || e.which;
+                    your_dude('move_stop', code);
+
+                    if( code == 37 && dx == -move_speed ) {
+                        // Left
+                        dx = 0;
+                    }
+                    else if( code == 38 && dy == -move_speed ) {
+                        // Up
+                        dy = 0;
+                    }
+                    else if( code == 39 && dx == move_speed ) {
+                        // Right
+                        dx = 0;
+                    }
+                    else if( code == 40 && dy == move_speed ) {
+                        // Down
+                        dy = 0;
+                    }
+                    
+                });
+                */
+                
+            });
+
+            draw = function() {
+                //Clear Canvas
+                ctx.clearRect(0,0,clearX,clearY);
+                //If image is <= Canvas Size
+                if (imgW <= CanvasXSize) {
+                    //reset, start from beginning
+                    if (x > (CanvasXSize)) { x = 0; }
+                    //draw aditional image
+                    if (x > (CanvasXSize-imgW)) { ctx.drawImage(img,x-CanvasXSize+1,y,imgW,imgH); }
+                }
+                //If image is > Canvas Size
+                else {
+                    //reset, start from beginning
+                    if (x > (CanvasXSize)) { x = CanvasXSize-imgW; }
+                    //draw aditional image
+                    if (x > (CanvasXSize-imgW)) { ctx.drawImage(img,x-imgW+1,y,imgW,imgH); }
+                }
+                //draw image
+                ctx.drawImage(img,x,y,imgW,imgH);
+                //amount to move
+                x += dx;
+            };
+/*
+            // Speech bubble that originates from point x, y
+            speechBubble = function( ctx, x, y, width, height, radius ) {
+                var curvy_width = 20;
+                var curvy_height = 20;
+                var curviness = 10;
+
+                // Draw curvy part
+                ctx.beginPath();
+                ctx.moveTo(x, y);
+                ctx.quadraticCurveTo(x+curvy_width/2+curviness, y-curvy_height/2, x, y-curvy_height);
+                ctx.moveTo(x, y);
+                ctx.quadraticCurveTo(x+curvy_width/2+curviness, y-curvy_height/2, x+curvy_height, y-curvy_height);
+                
+                //Draw Rectangular part
+                var rect_x = x + curvy_width/2 - width/2;
+                var rect_y = y - curvy_height - height;
+
+                ctx.moveTo(rect_x, rect_y+radius);
+                ctx.lineTo(rect_x, rect_y+height-radius);
+                ctx.quadraticCurveTo(rect_x, rect_y+height, rect_x+radius, rect_y+height);
+                ctx.lineTo(rect_x+width/2-curvy_width/2, rect_y+height);
+                ctx.moveTo(rect_x+width/2+curvy_width/2, rect_y+height);
+                ctx.lineTo(rect_x+width-radius, rect_y+height);
+                ctx.quadraticCurveTo(rect_x+width, rect_y+height, rect_x+width, rect_y+height-radius);
+                ctx.lineTo(rect_x+width, rect_y+radius);
+                ctx.quadraticCurveTo(rect_x+width, rect_y, rect_x+width-radius, rect_y);
+                ctx.lineTo(rect_x+radius, rect_y);
+                ctx.quadraticCurveTo(rect_x, rect_y, rect_x, rect_y+radius);
+                ctx.stroke();
+            };
+
+            // Character face center is at x, y
+            character = function( ctx, x, y ) {
+                var dude_height = 50;
+                // Draw face
+                ctx.beginPath();
+                ctx.arc(x, y, dude_size, 0, Math.PI*2, true);
+                ctx.stroke();
+            };
+
+            move = function() {
+                ctx.clearRect(0, 0, 500, 500);
+                xpos = xpos + dx;
+                ypos = ypos + dy;
+                if( xpos > 500-dude_size )
+                    xpos = 500-dude_size;
+                if( xpos < dude_size )
+                    xpos = dude_size;
+                if( ypos > 500-dude_size )
+                    ypos = 500-dude_size;
+                if( ypos < dude_size )
+                    ypos = dude_size;
+                character(ctx, xpos, ypos);
+            };
+            */
+        </script>
+    </head>
+    <body>
+        <div id="hat-game" height="500" width="750">
+        </div>
+    </body>
+</html>
