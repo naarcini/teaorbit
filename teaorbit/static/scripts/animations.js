@@ -264,7 +264,7 @@ function gameCanvas(jq_elem, xpos, ypos, move_speed, max_x, max_y) {
 
             if( image_info[1] ) {
                 this.context.save();
-                this.context.translate(this.context.canvas.width, 0);
+                this.context.translate(this.context.width, 0);
                 this.context.scale(-1, 1);
                 this.context.drawImage(img, this.context.width/2 - img_width/2 + x_off, this.context.height/2 - img_height/2 - y_off, img_width, img_height);
                 this.context.restore();
