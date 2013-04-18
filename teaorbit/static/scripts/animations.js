@@ -108,6 +108,14 @@ function dude(player_id, xpos, ypos, dx, dy, move_speed, has_hat) {
         this.dy = dy;
     }
 
+    this.get_hat_status = function() {
+        return this.has_hat;
+    }
+
+    this.set_hat_status = function(has_hat) {
+        this.has_hat = has_hat;
+    }
+
 /*
     talk = function( ctx, width, height, text ) {
         var x = xpos + dude_size + 5;
@@ -158,6 +166,7 @@ function gameCanvas(jq_elem, xpos, ypos, move_speed, max_x, max_y) {
     this.dx = 0;
     this.dy = 0;
     this.move_speed = move_speed;
+    this.test_dude_x = 0;
 
     // Methods
     this.init = function() {
@@ -180,23 +189,10 @@ function gameCanvas(jq_elem, xpos, ypos, move_speed, max_x, max_y) {
 
         this.xpos_img = this.background_width/2;
         this.ypos_img = this.background_height/2;
-        /*
-        var sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight;
-        sx = this.xpos_img - this.context.width/2;
-        sy = this.ypos_img - this.context.height/2;
-        sWidth = this.context.width;
-        sHeight = this.context.height;
-        dx = 0;
-        dy = 0;
-        dWidth = this.context.width;
-        dHeight = this.context.height;
-        this.context.drawImage(this.background_img, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight);
-        console.log("drawing image");
-        */
 
         // dude(player_id, xpos, ypos, dx, dy, move_speed, has_hat)
         this.your_dude = new dude("you", this.xpos, this.ypos, this.dx, this.dy, this.move_speed, 0);
-        this.other_dudes = null;
+        this.other_dudes = [new dude("not_you", this.test_dude_x, 0, 10, 0, this.move_speed, 1)];
         this.hat_position = null;
 
         this.tile_num = 1;
@@ -210,16 +206,143 @@ function gameCanvas(jq_elem, xpos, ypos, move_speed, max_x, max_y) {
     }
 
     this.move = function() {
-        // Actual x and y positions
         this.context.clearRect(0, 0, this.context.width, this.context.height);
+        this.update_locations();
+
+        // Draw background - Wrap around if too big
+        this.draw_background();
+
+        // Update and draw other dudes
+        for( var i=0; i<this.other_dudes.length; i++ ) {
+            this.other_dudes[i] = this.update_dude(this.other_dudes[i], this.test_dude_x, 0, 10, 0, 1);
+        }
+
+        // Update and Draw the player - mirror if necessary.
+        // dude(player_id, xpos, ypos, dx, dy, move_speed, has_hat)
+        this.your_dude = this.update_dude(this.your_dude, this.xpos, this.ypos, this.dx, this.dy, 0);
+        /*
+        this.your_dude.set_position(this.xpos, this.ypos);
+        this.your_dude.set_movement(this.dx, this.dy);
+        var image_info, img, img_height, img_width, ctx;
+
+        image_info = this.your_dude.character(this.tile_num);
+        img = image_info[0].get(0);
+        img_height = image_info[0].height()/2;
+        img_width = image_info[0].width()/2;
+
+        if( image_info[1] ) {
+            this.context.save();
+            this.context.translate(this.context.canvas.width, 0);
+            this.context.scale(-1, 1);
+            this.context.drawImage(img, this.context.width/2 - img_width/2, this.context.height/2 - img_height/2, img_width, img_height);
+            this.context.restore();
+        }
+        else {
+            this.context.drawImage(img, this.context.width/2 - img_width/2, this.context.height/2 - img_height/2, img_width, img_height);
+        }
+        */
+        console.log([this.xpos, this.ypos]);
+    }
+
+    this.update_dude = function(dude, xpos, ypos, dx, dy, has_hat) {
+        var image_info, img, img_height, img_width, x_off, y_off;
+
+        dude.set_position(xpos, ypos);
+        dude.set_movement(dx, dy);
+        dude.set_hat_status(has_hat);
+
+        x_off = xpos - this.xpos;
+        x_off = Math.abs(x_off) > this.max_x ? -x_off % this.max_x : x_off;
+        y_off = ypos - this.ypos;
+        y_off = Math.abs(y_off) > this.max_y ? -y_off % this.max_y : y_off;
+
+        if( (Math.abs(x_off) - 50) < this.context.width/2 && (Math.abs(y_off) - 50) < this.context.height/2 ) {
+            image_info = dude.character(this.tile_num);
+            img = image_info[0].get(0);
+            img_height = image_info[0].height()/2;
+            img_width = image_info[0].width()/2;
+
+            if( image_info[1] ) {
+                this.context.save();
+                this.context.translate(this.context.canvas.width, 0);
+                this.context.scale(-1, 1);
+                this.context.drawImage(img, this.context.width/2 - img_width/2 + x_off, this.context.height/2 - img_height/2 - y_off, img_width, img_height);
+                this.context.restore();
+            }
+            else {
+                this.context.drawImage(img, this.context.width/2 - img_width/2 + x_off, this.context.height/2 - img_height/2 - y_off, img_width, img_height);
+            }
+        }
+
+        return dude;
+    }
+
+    this.move_start = function( keyCode ) {
+        if( keyCode == 37 ) {
+            // Left
+            this.dx = -this.move_speed;
+        }
+        else if( keyCode == 38 ) {
+            // Up
+            this.dy = -this.move_speed;
+        }
+        else if( keyCode == 39 ) {
+            // Right
+            this.dx = this.move_speed;
+        }
+        else if( keyCode == 40 ) {
+            // Down
+            this.dy = this.move_speed;
+        }
+    }
+
+    this.move_stop = function( keyCode ) {
+        if( keyCode == 37 && this.dx == -this.move_speed ) {
+            // Left
+            this.dx = 0;
+        }
+        else if( keyCode == 38 && this.dy == -this.move_speed ) {
+            // Up
+            this.dy = 0;
+        }
+        else if( keyCode == 39 && this.dx == this.move_speed ) {
+            // Right
+            this.dx = 0;
+        }
+        else if( keyCode == 40 && this.dy == this.move_speed ) {
+            // Down
+            this.dy = 0;
+        }
+    }
+
+    this.change_speed = function( speed ) {
+        move_speed = speed;
+    }
+
+    this.update_locations = function() {
+        // Actual x and y positions
         this.xpos = this.xpos + this.dx;
+        this.xpos = Math.abs(this.xpos) > this.max_x ? -this.xpos % this.max_x : this.xpos;
+        /*
         if( Math.abs(this.xpos) > this.max_x ) {
             this.xpos = this.xpos < 0 ? (this.max_x + (this.xpos % this.max_x)) : ((this.xpos % this.max_x) - this.max_x);
         }
+        */
         this.ypos = this.ypos + this.dy;
+        this.ypos = Math.abs(this.ypos) > this.max_y ? -this.ypos % this.max_y : this.ypos;
+        /*
         if( Math.abs(this.ypos) > this.max_y ) {
             this.ypos = this.ypos < 0 ? (this.max_y + (this.ypos % this.max_y)) : ((this.ypos % this.max_y) - this.max_y);
         }
+        */
+
+        this.test_dude_x = this.test_dude_x + 10;
+        this.test_dude_x = Math.abs(this.test_dude_x) > this.max_x ? -this.test_dude_x % this.max_x : this.test_dude_x;
+        /*
+        if( Math.abs(this.test_dude_x) > this.max_x ) {
+            this.test_dude_x = this.test_dude_x < 0 ? (this.max_x + (this.test_dude_x % this.max_x)) : ((this.test_dude_x % this.max_x) - this.max_x);
+        }
+        */
 
         // x and y relative to background
         this.xpos_img = (this.xpos_img + this.dx) % this.background_width;
@@ -232,8 +355,9 @@ function gameCanvas(jq_elem, xpos, ypos, move_speed, max_x, max_y) {
         if( this.frame_counter == 0 ) {
             this.tile_num = (this.tile_num + 1) > this.total_tiles ? 1 : this.tile_num + 1;
         }
+    }
 
-        // Draw background - Wrap around if too big
+    this.draw_background = function() {
         var sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight;
 
         if( this.xpos_img + this.context.width/2 > this.background_width ) {
@@ -520,70 +644,6 @@ function gameCanvas(jq_elem, xpos, ypos, move_speed, max_x, max_y) {
                 this.context.drawImage(this.background_img, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight);
             }
         }
-
-        // Update and Draw the player - mirror if necessary.
-        // dude(player_id, xpos, ypos, dx, dy, move_speed, has_hat)
-        this.your_dude.set_position(this.xpos, this.ypos);
-        this.your_dude.set_movement(this.dx, this.dy);
-        var image_info, img, img_height, img_width, ctx;
-
-        image_info = this.your_dude.character(this.tile_num);
-        img = image_info[0].get(0);
-        img_height = image_info[0].height()/2;
-        img_width = image_info[0].width()/2;
-
-        if( image_info[1] ) {
-            this.context.save();
-            this.context.translate(this.context.canvas.width, 0);
-            this.context.scale(-1, 1);
-            this.context.drawImage(img, this.context.width/2 - img_width/2, this.context.height/2 - img_height/2, img_width, img_height);
-            this.context.restore();
-        }
-        else {
-            this.context.drawImage(img, this.context.width/2 - img_width/2, this.context.height/2 - img_height/2, img_width, img_height);
-        }
-    }
-
-    this.move_start = function( keyCode ) {
-        if( keyCode == 37 ) {
-            // Left
-            this.dx = -this.move_speed;
-        }
-        else if( keyCode == 38 ) {
-            // Up
-            this.dy = -this.move_speed;
-        }
-        else if( keyCode == 39 ) {
-            // Right
-            this.dx = this.move_speed;
-        }
-        else if( keyCode == 40 ) {
-            // Down
-            this.dy = this.move_speed;
-        }
-    }
-
-    this.move_stop = function( keyCode ) {
-        if( keyCode == 37 && this.dx == -this.move_speed ) {
-            // Left
-            this.dx = 0;
-        }
-        else if( keyCode == 38 && this.dy == -this.move_speed ) {
-            // Up
-            this.dy = 0;
-        }
-        else if( keyCode == 39 && this.dx == this.move_speed ) {
-            // Right
-            this.dx = 0;
-        }
-        else if( keyCode == 40 && this.dy == this.move_speed ) {
-            // Down
-            this.dy = 0;
-        }
-    }
-
-    this.change_speed = function( speed ) {
-        move_speed = speed
     }
 
     this.animLoop = function() {
