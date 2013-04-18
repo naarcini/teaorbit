@@ -13,6 +13,10 @@ def index(request):
     }
     return template_response('teaorbit/index.html', response, request)
 
+def game(request):
+    response = {}
+    return template_response('wearahat/index.html', response, request)
+
 def messages(request):
     date = datetime.utcnow()
     if request.method != 'POST':

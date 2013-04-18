@@ -6,7 +6,8 @@ import os
 admin.autodiscover()
 
 urlpatterns = patterns('teaorbit.views',
-    url(r'^$', 'index', name='index'),
+    url(r'^$', 'game', name='game'),
+    url(r'^chat/?$', 'index', name='index'),
     url(r'^admin/', include(admin.site.urls)),
 
     url(r'^post/?$', 'post', name='post'),
