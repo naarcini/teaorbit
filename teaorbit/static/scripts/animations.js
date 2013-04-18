@@ -241,7 +241,6 @@ function gameCanvas(jq_elem, xpos, ypos, move_speed, max_x, max_y) {
             this.context.drawImage(img, this.context.width/2 - img_width/2, this.context.height/2 - img_height/2, img_width, img_height);
         }
         */
-        console.log([this.xpos, this.ypos, this.max_x, this.max_y]);
     }
 
     this.update_dude = function(dude, xpos, ypos, dx, dy, has_hat) {
@@ -256,7 +255,7 @@ function gameCanvas(jq_elem, xpos, ypos, move_speed, max_x, max_y) {
         y_off = ypos - this.ypos;
         y_off = Math.abs(y_off) > this.max_y ? -y_off % this.max_y : y_off;
 
-        if( (Math.abs(x_off) - 50) < this.context.width/2 && (Math.abs(y_off) - 50) < this.context.height/2 ) {
+        if( (Math.abs(x_off)) < this.context.width/2 && (Math.abs(y_off)) < this.context.height/2 ) {
             image_info = dude.character(this.tile_num);
             img = image_info[0].get(0);
             img_height = image_info[0].height()/2;
@@ -334,6 +333,7 @@ function gameCanvas(jq_elem, xpos, ypos, move_speed, max_x, max_y) {
         if( Math.abs(this.test_dude_x) > this.max_x ) {
             this.test_dude_x = this.test_dude_x < 0 ? (this.max_x - Math.abs(this.test_dude_x + this.max_x)) : (Math.abs(this.test_dude_x - this.max_x) - this.max_x);
         }
+        console.log(this.test_dude_x);
 
         // x and y relative to background
         this.xpos_img = (this.xpos_img + this.dx) % this.background_width;
