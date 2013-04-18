@@ -54,8 +54,9 @@ function dude(player_id, xpos, ypos, dx, dy, move_speed, has_hat) {
     this.guy = 1;
 
     // Methods
-    character = function( tile_num ) {
-        var img = new Image();
+    this.character = function( tile_num ) {
+        var img = null;
+        var selector = null;
         var mirror = false;
         var hat_text = this.has_hat ? 'HAT_' : '';
         var guy_text = this.guy.toString();
@@ -65,43 +66,44 @@ function dude(player_id, xpos, ypos, dx, dy, move_speed, has_hat) {
         }
 
         if( this.dx > 0 ) {
-            img.src = '../GUY'+guy_text+'_WALK_SIDE_'+hat_text+tile_text+'.png';
+            selector = 'GUY'+guy_text+'_WALK_SIDE_'+hat_text+tile_text;
             mirror = true;
         }
         else if( this.dx < 0) {
-            img.src = '../GUY'+guy_text+'_WALK_SIDE_'+hat_text+tile_text+'.png';
+            selector = 'GUY'+guy_text+'_WALK_SIDE_'+hat_text+tile_text
         }
         else if( this.dy > 0 ) {
-            img.src = '../GUY'+guy_text+'_WALK_FRONT_'+hat_text+tile_text+'.png';
+            selector = 'GUY'+guy_text+'_WALK_FRONT_'+hat_text+tile_text;
         }
         else if( this.dy < 0 ) {
-            img.src = '../GUY'+guy_text+'_WALK_BACK_'+hat_text+tile_text+'.png';
+            selector = 'GUY'+guy_text+'_WALK_BACK_'+hat_text+tile_text;
         }
         else {
-            img.src = '../GUY'+guy_text+'_IDLE_'+hat_text+tile_text+'.png';
+            selector = 'GUY'+guy_text+'_IDLE_'+hat_text+tile_text;
         }
 
+        img = $('#'+selector);
         return [img, mirror];
     }
 
-    get_player = function() {
+    this.get_player = function() {
         return player_id;
     }
 
-    get_position = function() {
+    this.get_position = function() {
         return [this.xpos, this.ypos];
     }
 
-    set_position = function(xpos, ypos) {
+    this.set_position = function(xpos, ypos) {
         this.xpos = xpos;
         this.ypos = ypos;
     }
 
-    get_movement = function() {
+    this.get_movement = function() {
         return[this.dx, this.dy];
     }
 
-    set_movement = function(dx, dy) {
+    this.set_movement = function(dx, dy) {
         this.dx = dx;
         this.dy = dy;
     }
@@ -140,8 +142,10 @@ function dude(player_id, xpos, ypos, dx, dy, move_speed, has_hat) {
         ctx.stroke();
     }
     */
+    
 
 }
+
 
 function gameCanvas(jq_elem, xpos, ypos, move_speed, max_x, max_y) {
     this.jq_elem = jq_elem;
@@ -155,9 +159,6 @@ function gameCanvas(jq_elem, xpos, ypos, move_speed, max_x, max_y) {
     this.dy = 0;
     this.move_speed = move_speed;
 
-    this.your_dude = null;
-    this.other_dudes = null;
-
     // Methods
     this.init = function() {
         this.game_canvas = new Canvas(jq_elem);
@@ -166,10 +167,42 @@ function gameCanvas(jq_elem, xpos, ypos, move_speed, max_x, max_y) {
         this.background = $('#game_background');
         this.background_height = this.background.height();
         this.background_width = this.background.width();
-        this.background_img = this.background[0];
+        this.background_img = this.background.get(0);
+        /*
+        console.log(this.background);
+        console.log(this.background_width);
+        console.log(this.background_height);
+        console.log(this.background_img);
+        console.log(this.jq_elem);
+        console.log(this.context.width);
+        console.log(this.context.height);
+        */
 
         this.xpos_img = this.background_width/2;
         this.ypos_img = this.background_height/2;
+        /*
+        var sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight;
+        sx = this.xpos_img - this.context.width/2;
+        sy = this.ypos_img - this.context.height/2;
+        sWidth = this.context.width;
+        sHeight = this.context.height;
+        dx = 0;
+        dy = 0;
+        dWidth = this.context.width;
+        dHeight = this.context.height;
+        this.context.drawImage(this.background_img, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight);
+        console.log("drawing image");
+        */
+
+        // dude(player_id, xpos, ypos, dx, dy, move_speed, has_hat)
+        this.your_dude = new dude("you", this.xpos, this.ypos, this.dx, this.dy, this.move_speed, 0);
+        this.other_dudes = null;
+        this.hat_position = null;
+
+        this.tile_num = 1;
+        this.total_tiles = 2;
+        this.frame_counter = 1;
+        this.tile_interval = 10;
     }
 
     this.resetGameCanvas = function() {
@@ -180,12 +213,12 @@ function gameCanvas(jq_elem, xpos, ypos, move_speed, max_x, max_y) {
         // Actual x and y positions
         this.context.clearRect(0, 0, this.context.width, this.context.height);
         this.xpos = this.xpos + this.dx;
-        if( Math.abs(this.xpos) > max_x ) {
-            this.xpos = this.xpos < 0 ? (max_x + (this.xpos % max_x)) : ((this.xpos % max_x) - max_x);
+        if( Math.abs(this.xpos) > this.max_x ) {
+            this.xpos = this.xpos < 0 ? (this.max_x + (this.xpos % this.max_x)) : ((this.xpos % this.max_x) - this.max_x);
         }
         this.ypos = this.ypos + this.dy;
-        if( Math.abs(this.ypos) > max_y ) {
-            this.ypos = this.ypos < 0 ? (max_y + (this.ypos % max_y)) : ((this.ypos % max_y) - max_y);
+        if( Math.abs(this.ypos) > this.max_y ) {
+            this.ypos = this.ypos < 0 ? (this.max_y + (this.ypos % this.max_y)) : ((this.ypos % this.max_y) - this.max_y);
         }
 
         // x and y relative to background
@@ -194,14 +227,19 @@ function gameCanvas(jq_elem, xpos, ypos, move_speed, max_x, max_y) {
         this.ypos_img = (this.ypos_img + this.dy) % this.background_height;
         this.ypos_img = this.ypos_img < 0 ? this.background_height + this.ypos_img : this.ypos_img;
 
+        // Update frame
+        this.frame_counter = (this.frame_counter + 1) % this.tile_interval;
+        if( this.frame_counter == 0 ) {
+            this.tile_num = (this.tile_num + 1) > this.total_tiles ? 1 : this.tile_num + 1;
+        }
+
         // Draw background - Wrap around if too big
         var sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight;
 
         if( this.xpos_img + this.context.width/2 > this.background_width ) {
             if( this.ypos_img + this.context.height/2 > this.background_height ) {
-                
             }
-            else if ( this.ypos_img - this.context.height/2 < this.background_height ) {
+            else if ( this.ypos_img - this.context.height/2 < 0 ) {
             }
             else {
             }
@@ -209,7 +247,7 @@ function gameCanvas(jq_elem, xpos, ypos, move_speed, max_x, max_y) {
         else if ( this.xpos_img - this.context.width/2 < 0 ) {
             if( this.ypos_img + this.context.height/2 > this.background_height ) {
             }
-            else if ( this.ypos_img - this.context.height/2 < this.background_height ) {
+            else if ( this.ypos_img - this.context.height/2 < 0) {
             }
             else {
             }
@@ -217,57 +255,79 @@ function gameCanvas(jq_elem, xpos, ypos, move_speed, max_x, max_y) {
         else {
             if( this.ypos_img + this.context.height/2 > this.background_height ) {
             }
-            else if ( this.ypos_img - this.context.height/2 < this.background_height ) {
+            else if ( this.ypos_img - this.context.height/2 < 0 ) {
             }
             else {
-                sx = xpos_img - context.width/2;
-                sy = ypos_img - context.height/2;
-                sWidth = context.width;
-                sHeight = context.height;
+                sx = this.xpos_img - this.context.width/2;
+                sy = this.ypos_img - this.context.height/2;
+                sWidth = this.context.width;
+                sHeight = this.context.height;
                 dx = 0;
                 dy = 0;
-                dWidth = context.width;
-                dHeight = context.height;
-                drawImage(this.background_img, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight);
+                dWidth = this.context.width;
+                dHeight = this.context.height;
+                this.context.drawImage(this.background_img, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight);
             }
+        }
+
+        // Update and Draw the player - mirror if necessary.
+        // dude(player_id, xpos, ypos, dx, dy, move_speed, has_hat)
+        this.your_dude.set_position(this.xpos, this.ypos);
+        this.your_dude.set_movement(this.dx, this.dy);
+        var image_info, img, img_height, img_width, ctx;
+
+        image_info = this.your_dude.character(this.tile_num);
+        img = image_info[0].get(0);
+        img_height = image_info[0].height();
+        img_width = image_info[0].width();
+
+        if( image_info[1] ) {
+            this.context.save();
+            this.context.translate(this.context.canvas.width, 0);
+            this.context.scale(-1, 1);
+            this.context.drawImage(img, this.context.width/2 - img_width/2, this.context.height/2 - img_height/2);
+            this.context.restore();
+        }
+        else {
+            this.context.drawImage(img, this.context.width/2 - img_width/2, this.context.height/2 - img_height/2);
         }
     }
 
     this.move_start = function( keyCode ) {
-        if( code == 37 ) {
+        if( keyCode == 37 ) {
             // Left
-            dx = -move_speed;
+            this.dx = -this.move_speed;
         }
-        else if( code == 38 ) {
+        else if( keyCode == 38 ) {
             // Up
-            dy = -move_speed;
+            this.dy = -this.move_speed;
         }
-        else if( code == 39 ) {
+        else if( keyCode == 39 ) {
             // Right
-            dx = move_speed;
+            this.dx = this.move_speed;
         }
-        else if( code == 40 ) {
+        else if( keyCode == 40 ) {
             // Down
-            dy = move_speed;
+            this.dy = this.move_speed;
         }
     }
 
     this.move_stop = function( keyCode ) {
-        if( code == 37 && dx == -move_speed ) {
+        if( keyCode == 37 && this.dx == -this.move_speed ) {
             // Left
-            dx = 0;
+            this.dx = 0;
         }
-        else if( code == 38 && dy == -move_speed ) {
+        else if( keyCode == 38 && this.dy == -this.move_speed ) {
             // Up
-            dy = 0;
+            this.dy = 0;
         }
-        else if( code == 39 && dx == move_speed ) {
+        else if( keyCode == 39 && this.dx == this.move_speed ) {
             // Right
-            dx = 0;
+            this.dx = 0;
         }
-        else if( code == 40 && dy == move_speed ) {
+        else if( keyCode == 40 && this.dy == this.move_speed ) {
             // Down
-            dy = 0;
+            this.dy = 0;
         }
     }
 
@@ -278,7 +338,7 @@ function gameCanvas(jq_elem, xpos, ypos, move_speed, max_x, max_y) {
     this.animLoop = function() {
         if(this.state == 'running') {
             this.anim_frame = requestAnimFrame(this.animLoop.bind(this));
-            move();
+            this.move();
         }
     }
 

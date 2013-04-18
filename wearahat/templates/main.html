@@ -5,6 +5,7 @@
             Wear a Hat!
         </title>
         <script type="text/javascript" charset="utf-8" src="../site_media/scripts/jquery-1.9.1.min.js"></script>
+        <script type="text/javascript" charset="utf-8" src="../site_media/scripts/animframe.js"></script>
         <script type="text/javascript" charset="utf-8" src="../site_media/scripts/animations.js"></script>
         <script type="text/javascript">
             var canvas_jq, canvas, ctx, moveID, max_height, max_width, your_dude, other_dudes;
@@ -12,6 +13,17 @@
             $(document).ready( function () {
                 $('#hat-game').css('min-height', $(window).innerHeight());
                 $('#hat-game').css('min-width', $(window).innerWidth());
+                
+                canvas = new gameCanvas($('#hat-game'), 0, 0, 10, 1000, 1000);
+
+                $('#game_background').load( function() {
+                    canvas.init();
+                    console.log('Initted');
+                    canvas.start();
+                    console.log('started');
+                });
+                
+                
 /*
                 canvas_jq = new Canvas($('#hat-game'));
                 canvas = canvas_jq.get(0);
@@ -27,53 +39,17 @@
                 // Dude initialization
                 your_dude = new dude(250, 250, 5, 15);
                 moveID = window.setInterval( your_dude('move', ctx, width, height), 100 );
-
+*/
                 $('body').on('keydown', function(e) {
                     var code = e.keyCode || e.which;
-                    your_dude('move_start', code);
-
-                    if( code == 37 ) {
-                        // Left
-                        dx = -move_speed;
-                    }
-                    else if( code == 38 ) {
-                        // Up
-                        dy = -move_speed;
-                    }
-                    else if( code == 39 ) {
-                        // Right
-                        dx = move_speed;
-                    }
-                    else if( code == 40 ) {
-                        // Down
-                        dy = move_speed;
-                    }
-                    
+                    canvas.move_start(code);
                 });
 
                 $('body').on('keyup', function(e) {
                     var code = e.keyCode || e.which;
-                    your_dude('move_stop', code);
-
-                    if( code == 37 && dx == -move_speed ) {
-                        // Left
-                        dx = 0;
-                    }
-                    else if( code == 38 && dy == -move_speed ) {
-                        // Up
-                        dy = 0;
-                    }
-                    else if( code == 39 && dx == move_speed ) {
-                        // Right
-                        dx = 0;
-                    }
-                    else if( code == 40 && dy == move_speed ) {
-                        // Down
-                        dy = 0;
-                    }
-                    
+                    canvas.move_stop(code);
                 });
-                */
+                
                 
             });
 /*
@@ -149,6 +125,22 @@
         </script>
     </head>
     <body>
+        <img id="GUY1_IDLE_01" src="../site_media/ANIMATION/GUY1_IDLE_01.png" style="display: none;" />
+        <img id="GUY1_IDLE_02" src="../site_media/ANIMATION/GUY1_IDLE_02.png" style="display: none;" />
+        <img id="GUY1_IDLE_HAT_01" src="../site_media/ANIMATION/GUY1_IDLE_HAT_01.png" style="display: none;" />
+        <img id="GUY1_IDLE_HAT_02" src="../site_media/ANIMATION/GUY1_IDLE_HAT_02.png" style="display: none;" />
+        <img id="GUY1_WALK_BACK_01" src="../site_media/ANIMATION/GUY1_WALK_BACK_01.png" style="display: none;" />
+        <img id="GUY1_WALK_BACK_02" src="../site_media/ANIMATION/GUY1_WALK_BACK_02.png" style="display: none;" />
+        <img id="GUY1_WALK_BACK_HAT_01" src="../site_media/ANIMATION/GUY1_WALK_BACK_HAT_01.png" style="display: none;" />
+        <img id="GUY1_WALK_BACK_HAT_02" src="../site_media/ANIMATION/GUY1_WALK_BACK_HAT_02.png" style="display: none;" />
+        <img id="GUY1_WALK_FRONT_01" src="../site_media/ANIMATION/GUY1_WALK_FRONT_01.png" style="display: none;" />
+        <img id="GUY1_WALK_FRONT_02" src="../site_media/ANIMATION/GUY1_WALK_FRONT_02.png" style="display: none;" />
+        <img id="GUY1_WALK_FRONT_HAT_01" src="../site_media/ANIMATION/GUY1_WALK_FRONT_HAT_01.png" style="display: none;" />
+        <img id="GUY1_WALK_FRONT_HAT_02" src="../site_media/ANIMATION/GUY1_WALK_FRONT_HAT_02.png" style="display: none;" />
+        <img id="GUY1_WALK_SIDE_01" src="../site_media/ANIMATION/GUY1_WALK_SIDE_01.png" style="display: none;" />
+        <img id="GUY1_WALK_SIDE_02" src="../site_media/ANIMATION/GUY1_WALK_SIDE_02.png" style="display: none;" />
+        <img id="GUY1_WALK_SIDE_HAT_01" src="../site_media/ANIMATION/GUY1_WALK_SIDE_HAT_01.png" style="display: none;" />
+        <img id="GUY1_WALK_SIDE_HAT_02" src="../site_media/ANIMATION/GUY1_WALK_SIDE_HAT_02.png" style="display: none;" />
         <img id="game_background" src="../site_media/images/HAT_Background.png" style="display: none;" />
         <div id="hat-game">
         </div>
