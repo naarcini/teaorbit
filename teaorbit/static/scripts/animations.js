@@ -241,7 +241,7 @@ function gameCanvas(jq_elem, xpos, ypos, move_speed, max_x, max_y) {
             this.context.drawImage(img, this.context.width/2 - img_width/2, this.context.height/2 - img_height/2, img_width, img_height);
         }
         */
-        console.log([this.xpos, this.ypos]);
+        console.log([this.xpos, this.ypos, this.max_x, this.max_y]);
     }
 
     this.update_dude = function(dude, xpos, ypos, dx, dy, has_hat) {
@@ -266,11 +266,11 @@ function gameCanvas(jq_elem, xpos, ypos, move_speed, max_x, max_y) {
                 this.context.save();
                 this.context.translate(this.context.canvas.width, 0);
                 this.context.scale(-1, 1);
-                this.context.drawImage(img, this.context.width/2 - img_width/2 + x_off, this.context.height/2 - img_height/2 - y_off, img_width, img_height);
+                this.context.drawImage(img, this.context.width/2 - img_width/2 - x_off, this.context.height/2 - img_height/2 - y_off, img_width, img_height);
                 this.context.restore();
             }
             else {
-                this.context.drawImage(img, this.context.width/2 - img_width/2 + x_off, this.context.height/2 - img_height/2 - y_off, img_width, img_height);
+                this.context.drawImage(img, this.context.width/2 - img_width/2 - x_off, this.context.height/2 - img_height/2 - y_off, img_width, img_height);
             }
         }
 
@@ -322,27 +322,18 @@ function gameCanvas(jq_elem, xpos, ypos, move_speed, max_x, max_y) {
     this.update_locations = function() {
         // Actual x and y positions
         this.xpos = this.xpos + this.dx;
-        this.xpos = Math.abs(this.xpos) > this.max_x ? -this.xpos % this.max_x : this.xpos;
-        /*
         if( Math.abs(this.xpos) > this.max_x ) {
-            this.xpos = this.xpos < 0 ? (this.max_x + (this.xpos % this.max_x)) : ((this.xpos % this.max_x) - this.max_x);
+            this.xpos = this.xpos < 0 ? (this.max_x - Math.abs(this.xpos + this.max_x)) : (Math.abs(this.xpos - this.max_x) - this.max_x);
         }
-        */
-        this.ypos = this.ypos + this.dy;
-        this.ypos = Math.abs(this.ypos) > this.max_y ? -this.ypos % this.max_y : this.ypos;
-        /*
+        this.ypos = this.ypos - this.dy;
         if( Math.abs(this.ypos) > this.max_y ) {
-            this.ypos = this.ypos < 0 ? (this.max_y + (this.ypos % this.max_y)) : ((this.ypos % this.max_y) - this.max_y);
+            this.ypos = this.ypos < 0 ? (this.max_y - Math.abs(this.ypos + this.max_y)) : (Math.abs(this.ypos - this.max_y) - this.max_y);
         }
-        */
 
         this.test_dude_x = this.test_dude_x + 10;
-        this.test_dude_x = Math.abs(this.test_dude_x) > this.max_x ? -this.test_dude_x % this.max_x : this.test_dude_x;
-        /*
         if( Math.abs(this.test_dude_x) > this.max_x ) {
-            this.test_dude_x = this.test_dude_x < 0 ? (this.max_x + (this.test_dude_x % this.max_x)) : ((this.test_dude_x % this.max_x) - this.max_x);
+            this.test_dude_x = this.test_dude_x < 0 ? (this.max_x - Math.abs(this.test_dude_x + this.max_x)) : (Math.abs(this.test_dude_x - this.max_x) - this.max_x);
         }
-        */
 
         // x and y relative to background
         this.xpos_img = (this.xpos_img + this.dx) % this.background_width;
