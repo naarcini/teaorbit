@@ -42,41 +42,70 @@ function Canvas(jq_elem) {
     return canvas_jq;
 }
 
-function background() {
-    this.img = new Image();
-    img.src = '../images/HAT_Background.png';
-    
-}
-
-function dude(xpos, ypos, dx, dy, move_speed) {
+function dude(player_id, xpos, ypos, dx, dy, move_speed, has_hat) {
     // Instance variables
+    this.player_id = player_id
     this.xpos = xpos;
     this.ypos = ypos;
     this.dx = dx;
     this.dy = dy;
     this.move_speed = move_speed;
-    
-    // Methods
+    this.has_hat = has_hat;
+    this.guy = 1;
 
-    character = function( dx, dy, has_hat ) {
+    // Methods
+    character = function( tile_num ) {
         var img = new Image();
-        if( has_hat ) {
-            if( dx > 0 ) {
-            }
-            else if( dx < 0) {
-            }
-            else if( dy > 0 ) {
-            }
-            else if( dy < 0 ) {
-            }
-            else if( dy > 0 ) {
-            }
-            else {
-            }
+        var mirror = false;
+        var hat_text = this.has_hat ? 'HAT_' : '';
+        var guy_text = this.guy.toString();
+        var tile_text = tile_num.toString();
+        if( tile_num < 10 ) {
+            tile_text = '0'+ tile_text;
+        }
+
+        if( this.dx > 0 ) {
+            img.src = '../GUY'+guy_text+'_WALK_SIDE_'+hat_text+tile_text+'.png';
+            mirror = true;
+        }
+        else if( this.dx < 0) {
+            img.src = '../GUY'+guy_text+'_WALK_SIDE_'+hat_text+tile_text+'.png';
+        }
+        else if( this.dy > 0 ) {
+            img.src = '../GUY'+guy_text+'_WALK_FRONT_'+hat_text+tile_text+'.png';
+        }
+        else if( this.dy < 0 ) {
+            img.src = '../GUY'+guy_text+'_WALK_BACK_'+hat_text+tile_text+'.png';
         }
         else {
+            img.src = '../GUY'+guy_text+'_IDLE_'+hat_text+tile_text+'.png';
         }
+
+        return [img, mirror];
     }
+
+    get_player = function() {
+        return player_id;
+    }
+
+    get_position = function() {
+        return [this.xpos, this.ypos];
+    }
+
+    set_position = function(xpos, ypos) {
+        this.xpos = xpos;
+        this.ypos = ypos;
+    }
+
+    get_movement = function() {
+        return[this.dx, this.dy];
+    }
+
+    set_movement = function(dx, dy) {
+        this.dx = dx;
+        this.dy = dy;
+    }
+
 /*
     talk = function( ctx, width, height, text ) {
         var x = xpos + dude_size + 5;
@@ -114,34 +143,94 @@ function dude(xpos, ypos, dx, dy, move_speed) {
 
 }
 
-function gameCanvas(jq_elem, xpos, ypos, move_speed) {
+function gameCanvas(jq_elem, xpos, ypos, move_speed, max_x, max_y) {
     this.jq_elem = jq_elem;
-    this.canvas_jq = new Canvas(jq_elem);
     this.state = 'stopped';
     this.anim_frame = null;
     this.xpos = xpos;
     this.ypos = ypos;
+    this.max_x = max_x;
+    this.max_y = max_y;
     this.dx = 0;
     this.dy = 0;
     this.move_speed = move_speed;
 
-    this.your_dude = 
-    // Methods
+    this.your_dude = null;
+    this.other_dudes = null;
 
-    this.move = function( ctx, width, height ) {
-        ctx.clearRect(0, 0, ctx.width, ctx.height);
-        xpos = xpos + dx;
-        ypos = ypos + dy;
-        if( xpos > width-dude_size )
-            xpos = width-dude_size;
-        if( xpos < dude_size )
-            xpos = dude_size;
-        if( ypos > height-dude_size )
-            ypos = height-dude_size;
-        if( ypos < dude_size )
-            ypos = dude_size;
-    
-        character(ctx);
+    // Methods
+    this.init = function() {
+        this.game_canvas = new Canvas(jq_elem);
+        this.context = this.game_canvas.get(0).getContext('2d');
+
+        this.background = $('#game_background');
+        this.background_height = this.background.height();
+        this.background_width = this.background.width();
+        this.background_img = this.background[0];
+
+        this.xpos_img = this.background_width/2;
+        this.ypos_img = this.background_height/2;
+    }
+
+    this.resetGameCanvas = function() {
+        this.context.clearRect(0, 0, this.context.width, this.context.height);
+    }
+
+    this.move = function() {
+        // Actual x and y positions
+        this.context.clearRect(0, 0, this.context.width, this.context.height);
+        this.xpos = this.xpos + this.dx;
+        if( Math.abs(this.xpos) > max_x ) {
+            this.xpos = this.xpos < 0 ? (max_x + (this.xpos % max_x)) : ((this.xpos % max_x) - max_x);
+        }
+        this.ypos = this.ypos + this.dy;
+        if( Math.abs(this.ypos) > max_y ) {
+            this.ypos = this.ypos < 0 ? (max_y + (this.ypos % max_y)) : ((this.ypos % max_y) - max_y);
+        }
+
+        // x and y relative to background
+        this.xpos_img = (this.xpos_img + this.dx) % this.background_width;
+        this.xpos_img = this.xpos_img < 0 ? this.background_width + this.xpos_img : this.xpos_img;
+        this.ypos_img = (this.ypos_img + this.dy) % this.background_height;
+        this.ypos_img = this.ypos_img < 0 ? this.background_height + this.ypos_img : this.ypos_img;
+
+        // Draw background - Wrap around if too big
+        var sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight;
+
+        if( this.xpos_img + this.context.width/2 > this.background_width ) {
+            if( this.ypos_img + this.context.height/2 > this.background_height ) {
+                
+            }
+            else if ( this.ypos_img - this.context.height/2 < this.background_height ) {
+            }
+            else {
+            }
+        }
+        else if ( this.xpos_img - this.context.width/2 < 0 ) {
+            if( this.ypos_img + this.context.height/2 > this.background_height ) {
+            }
+            else if ( this.ypos_img - this.context.height/2 < this.background_height ) {
+            }
+            else {
+            }
+        }
+        else {
+            if( this.ypos_img + this.context.height/2 > this.background_height ) {
+            }
+            else if ( this.ypos_img - this.context.height/2 < this.background_height ) {
+            }
+            else {
+                sx = xpos_img - context.width/2;
+                sy = ypos_img - context.height/2;
+                sWidth = context.width;
+                sHeight = context.height;
+                dx = 0;
+                dy = 0;
+                dWidth = context.width;
+                dHeight = context.height;
+                drawImage(this.background_img, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight);
+            }
+        }
     }
 
     this.move_start = function( keyCode ) {
@@ -189,6 +278,19 @@ function gameCanvas(jq_elem, xpos, ypos, move_speed) {
     this.animLoop = function() {
         if(this.state == 'running') {
             this.anim_frame = requestAnimFrame(this.animLoop.bind(this));
+            move();
         }
+    }
+
+    this.start = function() {
+        if( this.state != 'running') {
+            this.state = 'running';
+            this.animLoop();
+        }
+    }
+
+    this.stop = function() {
+        this.state = 'stopped';
+        cancelAnimFrame(this.anim_frame);
     }
 }
