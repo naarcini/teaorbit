@@ -4,9 +4,12 @@
         <title>
             Wear a Hat!
         </title>
-        <script type="text/javascript" charset="utf-8" src="../site_media/scripts/jquery-1.9.1.min.js"></script>
-        <script type="text/javascript" charset="utf-8" src="../site_media/scripts/animframe.js"></script>
-        <script type="text/javascript" charset="utf-8" src="../site_media/scripts/animations.js"></script>
+        <style type="text/css">
+            html, body { margin: 0; padding: 0; }
+        </style>
+        <script type="text/javascript" charset="utf-8" src="{{ STATIC_URL }}scripts/jquery-1.9.1.min.js"></script>
+        <script type="text/javascript" charset="utf-8" src="{{ STATIC_URL }}scripts/animframe.js"></script>
+        <script type="text/javascript" charset="utf-8" src="{{ STATIC_URL }}scripts/animations.js"></script>
         <script type="text/javascript">
             var canvas_jq, canvas, ctx, moveID, max_height, max_width, your_dude, other_dudes;
 
@@ -28,7 +31,7 @@
                 ctx = canvas.getContext('2d');
                 
                 var img = new Image()
-                img.src = '../site_media/images/HAT_Background.png';
+                img.src = '{{ STATIC_URL }}images/HAT_Background.png';
                  
                 img.onload = function() {
                     ctx.drawImage(img, 0, 0);
@@ -123,23 +126,23 @@
         </script>
     </head>
     <body>
-        <img id="GUY1_IDLE_01" src="../site_media/ANIMATION/GUY1_IDLE_01.png" style="display: none;" />
-        <img id="GUY1_IDLE_02" src="../site_media/ANIMATION/GUY1_IDLE_02.png" style="display: none;" />
-        <img id="GUY1_IDLE_HAT_01" src="../site_media/ANIMATION/GUY1_IDLE_HAT_01.png" style="display: none;" />
-        <img id="GUY1_IDLE_HAT_02" src="../site_media/ANIMATION/GUY1_IDLE_HAT_02.png" style="display: none;" />
-        <img id="GUY1_WALK_BACK_01" src="../site_media/ANIMATION/GUY1_WALK_BACK_01.png" style="display: none;" />
-        <img id="GUY1_WALK_BACK_02" src="../site_media/ANIMATION/GUY1_WALK_BACK_02.png" style="display: none;" />
-        <img id="GUY1_WALK_BACK_HAT_01" src="../site_media/ANIMATION/GUY1_WALK_BACK_HAT_01.png" style="display: none;" />
-        <img id="GUY1_WALK_BACK_HAT_02" src="../site_media/ANIMATION/GUY1_WALK_BACK_HAT_02.png" style="display: none;" />
-        <img id="GUY1_WALK_FRONT_01" src="../site_media/ANIMATION/GUY1_WALK_FRONT_01.png" style="display: none;" />
-        <img id="GUY1_WALK_FRONT_02" src="../site_media/ANIMATION/GUY1_WALK_FRONT_02.png" style="display: none;" />
-        <img id="GUY1_WALK_FRONT_HAT_01" src="../site_media/ANIMATION/GUY1_WALK_FRONT_HAT_01.png" style="display: none;" />
-        <img id="GUY1_WALK_FRONT_HAT_02" src="../site_media/ANIMATION/GUY1_WALK_FRONT_HAT_02.png" style="display: none;" />
-        <img id="GUY1_WALK_SIDE_01" src="../site_media/ANIMATION/GUY1_WALK_SIDE_01.png" style="display: none;" />
-        <img id="GUY1_WALK_SIDE_02" src="../site_media/ANIMATION/GUY1_WALK_SIDE_02.png" style="display: none;" />
-        <img id="GUY1_WALK_SIDE_HAT_01" src="../site_media/ANIMATION/GUY1_WALK_SIDE_HAT_01.png" style="display: none;" />
-        <img id="GUY1_WALK_SIDE_HAT_02" src="../site_media/ANIMATION/GUY1_WALK_SIDE_HAT_02.png" style="display: none;" />
-        <img id="game_background" src="../site_media/images/HAT_Background.png" style="display: none;" />
+        <img id="GUY1_IDLE_01" src="{{ STATIC_URL }}ANIMATION/GUY1_IDLE_01.png" style="display: none;" />
+        <img id="GUY1_IDLE_02" src="{{ STATIC_URL }}ANIMATION/GUY1_IDLE_02.png" style="display: none;" />
+        <img id="GUY1_IDLE_HAT_01" src="{{ STATIC_URL }}ANIMATION/GUY1_IDLE_HAT_01.png" style="display: none;" />
+        <img id="GUY1_IDLE_HAT_02" src="{{ STATIC_URL }}ANIMATION/GUY1_IDLE_HAT_02.png" style="display: none;" />
+        <img id="GUY1_WALK_BACK_01" src="{{ STATIC_URL }}ANIMATION/GUY1_WALK_BACK_01.png" style="display: none;" />
+        <img id="GUY1_WALK_BACK_02" src="{{ STATIC_URL }}ANIMATION/GUY1_WALK_BACK_02.png" style="display: none;" />
+        <img id="GUY1_WALK_BACK_HAT_01" src="{{ STATIC_URL }}ANIMATION/GUY1_WALK_BACK_HAT_01.png" style="display: none;" />
+        <img id="GUY1_WALK_BACK_HAT_02" src="{{ STATIC_URL }}ANIMATION/GUY1_WALK_BACK_HAT_02.png" style="display: none;" />
+        <img id="GUY1_WALK_FRONT_01" src="{{ STATIC_URL }}ANIMATION/GUY1_WALK_FRONT_01.png" style="display: none;" />
+        <img id="GUY1_WALK_FRONT_02" src="{{ STATIC_URL }}ANIMATION/GUY1_WALK_FRONT_02.png" style="display: none;" />
+        <img id="GUY1_WALK_FRONT_HAT_01" src="{{ STATIC_URL }}ANIMATION/GUY1_WALK_FRONT_HAT_01.png" style="display: none;" />
+        <img id="GUY1_WALK_FRONT_HAT_02" src="{{ STATIC_URL }}ANIMATION/GUY1_WALK_FRONT_HAT_02.png" style="display: none;" />
+        <img id="GUY1_WALK_SIDE_01" src="{{ STATIC_URL }}ANIMATION/GUY1_WALK_SIDE_01.png" style="display: none;" />
+        <img id="GUY1_WALK_SIDE_02" src="{{ STATIC_URL }}ANIMATION/GUY1_WALK_SIDE_02.png" style="display: none;" />
+        <img id="GUY1_WALK_SIDE_HAT_01" src="{{ STATIC_URL }}ANIMATION/GUY1_WALK_SIDE_HAT_01.png" style="display: none;" />
+        <img id="GUY1_WALK_SIDE_HAT_02" src="{{ STATIC_URL }}ANIMATION/GUY1_WALK_SIDE_HAT_02.png" style="display: none;" />
+        <img id="game_background" src="{{ STATIC_URL }}images/HAT_Background.png" style="display: none;" />
         <div id="hat-game">
         </div>
     </body>
