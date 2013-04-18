@@ -44,41 +44,40 @@ function Canvas(jq_elem) {
 
 function background() {
     this.img = new Image();
+    img.src = '../images/HAT_Background.png';
     
 }
 
-function dude(xpos, ypos, move_speed, dude_height, dude_width) {
+function dude(xpos, ypos, dx, dy, move_speed) {
     // Instance variables
     this.xpos = xpos;
     this.ypos = ypos;
-    this.dx = 0;
-    this.dy = 0;
+    this.dx = dx;
+    this.dy = dy;
     this.move_speed = move_speed;
-    this.dude_height = dude_height;
-    this.dude_width = dude_width;
     
     // Methods
-    character = function( ctx ) {
-        
-    }
 
-    move = function( ctx, width, height ) {
-    /*
-        ctx.clearRect(0, 0, ctx.width, ctx.height);
-        xpos = xpos + dx;
-        ypos = ypos + dy;
-        if( xpos > width-dude_size )
-            xpos = width-dude_size;
-        if( xpos < dude_size )
-            xpos = dude_size;
-        if( ypos > height-dude_size )
-            ypos = height-dude_size;
-        if( ypos < dude_size )
-            ypos = dude_size;
-    */
-        character(ctx);
+    character = function( dx, dy, has_hat ) {
+        var img = new Image();
+        if( has_hat ) {
+            if( dx > 0 ) {
+            }
+            else if( dx < 0) {
+            }
+            else if( dy > 0 ) {
+            }
+            else if( dy < 0 ) {
+            }
+            else if( dy > 0 ) {
+            }
+            else {
+            }
+        }
+        else {
+        }
     }
-
+/*
     talk = function( ctx, width, height, text ) {
         var x = xpos + dude_size + 5;
         var y = ypos - 5;
@@ -111,8 +110,41 @@ function dude(xpos, ypos, move_speed, dude_height, dude_width) {
         ctx.quadraticCurveTo(rect_x, rect_y, rect_x, rect_y+radius);
         ctx.stroke();
     }
+    */
 
-    move_start = function( keyCode ) {
+}
+
+function gameCanvas(jq_elem, xpos, ypos, move_speed) {
+    this.jq_elem = jq_elem;
+    this.canvas_jq = new Canvas(jq_elem);
+    this.state = 'stopped';
+    this.anim_frame = null;
+    this.xpos = xpos;
+    this.ypos = ypos;
+    this.dx = 0;
+    this.dy = 0;
+    this.move_speed = move_speed;
+
+    this.your_dude = 
+    // Methods
+
+    this.move = function( ctx, width, height ) {
+        ctx.clearRect(0, 0, ctx.width, ctx.height);
+        xpos = xpos + dx;
+        ypos = ypos + dy;
+        if( xpos > width-dude_size )
+            xpos = width-dude_size;
+        if( xpos < dude_size )
+            xpos = dude_size;
+        if( ypos > height-dude_size )
+            ypos = height-dude_size;
+        if( ypos < dude_size )
+            ypos = dude_size;
+    
+        character(ctx);
+    }
+
+    this.move_start = function( keyCode ) {
         if( code == 37 ) {
             // Left
             dx = -move_speed;
@@ -131,7 +163,7 @@ function dude(xpos, ypos, move_speed, dude_height, dude_width) {
         }
     }
 
-    move_stop = function( keyCode ) {
+    this.move_stop = function( keyCode ) {
         if( code == 37 && dx == -move_speed ) {
             // Left
             dx = 0;
@@ -150,9 +182,13 @@ function dude(xpos, ypos, move_speed, dude_height, dude_width) {
         }
     }
 
-    change_speed = function( speed ) {
+    this.change_speed = function( speed ) {
         move_speed = speed
     }
 
-    return this;
+    this.animLoop = function() {
+        if(this.state == 'running') {
+            this.anim_frame = requestAnimFrame(this.animLoop.bind(this));
+        }
+    }
 }
