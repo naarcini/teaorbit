@@ -238,26 +238,277 @@ function gameCanvas(jq_elem, xpos, ypos, move_speed, max_x, max_y) {
 
         if( this.xpos_img + this.context.width/2 > this.background_width ) {
             if( this.ypos_img + this.context.height/2 > this.background_height ) {
+                // Bottom right
+
+                sx = this.xpos_img - this.context.width/2;
+                sy = this.ypos_img - this.context.height/2;
+                sWidth = this.context.width/2 + (this.background_width - this.xpos_img);
+                sHeight = this.context.height/2 + (this.background_height - this.ypos_img);
+                dx = 0;
+                dy = 0;
+                dWidth = sWidth;
+                dHeight = sHeight;
+                this.context.drawImage(this.background_img, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight);
+
+                sx = 0;
+                sy = this.ypos_img - this.context.height/2;
+                sWidth = this.context.width/2 - (this.background_width - this.xpos_img);
+                sHeight = this.context.height/2 + (this.background_height - this.ypos_img);
+                dx = this.context.width - sWidth;
+                dy = 0;
+                dWidth = sWidth;
+                dHeight = sHeight;
+                this.context.drawImage(this.background_img, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight);
+
+                sx = this.xpos_img - this.context.width/2;
+                sy = 0;
+                sWidth = this.context.width/2 + (this.background_width - this.xpos_img);
+                sHeight = this.context.height/2 - (this.background_height - this.ypos_img);
+                dx = 0;
+                dy = this.context.height - sHeight;
+                dWidth = sWidth;
+                dHeight = sHeight;
+                this.context.drawImage(this.background_img, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight);
+
+                sx = 0;
+                sy = 0;
+                sWidth = this.context.width/2 - (this.background_width - this.xpos_img);
+                sHeight = this.context.height/2 - (this.background_height - this.ypos_img);
+                dx = this.context.width - sWidth;
+                dy = this.context.height - sHeight;
+                dWidth = sWidth;
+                dHeight = sHeight;
+                this.context.drawImage(this.background_img, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight);
             }
             else if ( this.ypos_img - this.context.height/2 < 0 ) {
+                // Top right
+
+                sx = this.xpos_img - this.context.width/2;
+                sy = this.background_height - (this.context.height/2 - this.ypos_img);
+                sWidth = this.context.width/2 + (this.background_width - this.xpos_img);
+                sHeight = this.context.height/2 - this.ypos_img;
+                dx = 0;
+                dy = 0;
+                dWidth = sWidth;
+                dHeight = sHeight;
+                this.context.drawImage(this.background_img, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight);
+
+                sx = 0;
+                sy = this.background_height - (this.context.height/2 - this.ypos_img);
+                sWidth = this.context.width/2 - (this.background_width - this.xpos_img);
+                sHeight = this.context.height/2 - this.ypos_img;
+                dx = this.context.width - sWidth;
+                dy = 0;
+                dWidth = sWidth;
+                dHeight = sHeight;
+                this.context.drawImage(this.background_img, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight);
+
+                sx = this.xpos_img - this.context.width/2;
+                sy = 0;
+                sWidth = this.context.width/2 + (this.background_width - this.xpos_img);
+                sHeight = this.context.height/2 + this.ypos_img;
+                dx = 0;
+                dy = this.context.height - sHeight;
+                dWidth = sWidth;
+                dHeight = sHeight;
+                this.context.drawImage(this.background_img, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight);
+
+                sx = 0;
+                sy = 0;
+                sWidth = this.context.width/2 - (this.background_width - this.xpos_img);
+                sHeight = this.context.height/2 + this.ypos_img;
+                dx = this.context.width - sWidth;
+                dy = this.context.height - sHeight;
+                dWidth = sWidth;
+                dHeight = sHeight;
+                this.context.drawImage(this.background_img, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight);
             }
             else {
+                // Far right
+
+                sx = this.xpos_img - this.context.width/2;
+                sy = this.ypos_img - this.context.height/2;
+                sWidth = this.context.width/2 + (this.background_width - this.xpos_img);
+                sHeight = this.context.height;
+                dx = 0;
+                dy = 0;
+                dWidth = sWidth;
+                dHeight = sHeight;
+                this.context.drawImage(this.background_img, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight);
+
+                sx = 0;
+                sy = this.ypos_img - this.context.height/2;
+                sWidth = this.context.width/2 - (this.background_width - this.xpos_img);
+                sHeight = this.context.height;
+                dx = this.context.width - sWidth;
+                dy = 0;
+                dWidth = sWidth;
+                dHeight = sHeight;
+                this.context.drawImage(this.background_img, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight);
             }
         }
         else if ( this.xpos_img - this.context.width/2 < 0 ) {
             if( this.ypos_img + this.context.height/2 > this.background_height ) {
+                // Bottom left
+
+                sx = this.background_width - (this.context.width/2 - this.xpos_img);
+                sy = this.ypos_img - this.context.height/2;
+                sWidth = this.context.width/2 - this.xpos_img;
+                sHeight = this.context.height/2 + (this.background_height - this.ypos_img);
+                dx = 0;
+                dy = 0;
+                dWidth = sWidth;
+                dHeight = sHeight;
+                this.context.drawImage(this.background_img, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight);
+
+                sx = 0;
+                sy = this.ypos_img - this.context.height/2;
+                sWidth = this.context.width/2 + this.xpos_img;
+                sHeight = this.context.height/2 + (this.background_height - this.ypos_img);
+                dx = this.context.width - sWidth;
+                dy = 0;
+                dWidth = sWidth;
+                dHeight = sHeight;
+                this.context.drawImage(this.background_img, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight);
+
+                sx = this.background_width - (this.context.width/2 - this.xpos_img);
+                sy = 0;
+                sWidth = this.context.width/2 - this.xpos_img;
+                sHeight = this.context.height/2 - (this.background_height - this.ypos_img);
+                dx = 0;
+                dy = this.context.height - sHeight;
+                dWidth = sWidth;
+                dHeight = sHeight;
+                this.context.drawImage(this.background_img, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight);
+
+                sx = 0;
+                sy = 0;
+                sWidth = this.context.width/2 + this.xpos_img;
+                sHeight = this.context.height/2 - (this.background_height - this.ypos_img);
+                dx = this.context.width - sWidth;
+                dy = this.context.height - sHeight;
+                dWidth = sWidth;
+                dHeight = sHeight;
+                this.context.drawImage(this.background_img, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight);
+                
             }
             else if ( this.ypos_img - this.context.height/2 < 0) {
+                // Top left
+
+                sx = this.background_width - (this.context.width/2 - this.xpos_img);
+                sy = this.background_height - (this.context.height/2 - this.ypos_img);
+                sWidth = this.context.width/2 - this.xpos_img;
+                sHeight = this.context.height/2 - this.ypos_img;
+                dx = 0;
+                dy = 0;
+                dWidth = sWidth;
+                dHeight = sHeight;
+                this.context.drawImage(this.background_img, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight);
+
+                sx = 0;
+                sy = this.background_height - (this.context.height/2 - this.ypos_img);
+                sWidth = this.context.width/2 + this.xpos_img;
+                sHeight = this.context.height/2 - this.ypos_img;
+                dx = this.context.width - sWidth;
+                dy = 0;
+                dWidth = sWidth;
+                dHeight = sHeight;
+                this.context.drawImage(this.background_img, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight);
+
+                sx = this.background_width - (this.context.width/2 - this.xpos_img);
+                sy = 0;
+                sWidth = this.context.width/2 - this.xpos_img;
+                sHeight = this.context.height/2 + this.ypos_img;
+                dx = 0;
+                dy = this.context.height - sHeight;
+                dWidth = sWidth;
+                dHeight = sHeight;
+                this.context.drawImage(this.background_img, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight);
+
+                sx = 0;
+                sy = 0;
+                sWidth = this.context.width/2 + this.xpos_img;
+                sHeight = this.context.height/2 + this.ypos_img;
+                dx = this.context.width - sWidth;
+                dy = this.context.height - sHeight;
+                dWidth = sWidth;
+                dHeight = sHeight;
+                this.context.drawImage(this.background_img, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight);
             }
             else {
+                // Far left
+
+                sx = this.background_width - (this.context.width/2 - this.xpos_img);
+                sy = this.ypos_img - this.context.height/2;
+                sWidth = this.context.width/2 - this.xpos_img;
+                sHeight = this.context.height;
+                dx = 0;
+                dy = 0;
+                dWidth = sWidth;
+                dHeight = sHeight;
+                this.context.drawImage(this.background_img, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight);
+
+                sx = 0;
+                sy = this.ypos_img - this.context.height/2;
+                sWidth = this.context.width/2 + this.xpos_img;
+                sHeight = this.context.height;
+                dx = this.context.width - sWidth;
+                dy = 0;
+                dWidth = sWidth;
+                dHeight = sHeight;
+                this.context.drawImage(this.background_img, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight);
             }
         }
         else {
             if( this.ypos_img + this.context.height/2 > this.background_height ) {
+                // Bottom
+
+                sx = this.xpos_img - this.context.width/2;
+                sy = this.ypos_img - this.context.height/2;
+                sWidth = this.context.width;
+                sHeight = this.context.height/2 + (this.background_height - this.ypos_img);
+                dx = 0;
+                dy = 0;
+                dWidth = sWidth;
+                dHeight = sHeight;
+                this.context.drawImage(this.background_img, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight);
+
+                sx = this.xpos_img - this.context.width/2;
+                sy = 0;
+                sWidth = this.context.width;
+                sHeight = this.context.height/2 - (this.background_height - this.ypos_img);
+                dx = 0;
+                dy = this.context.height - sHeight;
+                dWidth = sWidth;
+                dHeight = sHeight;
+                this.context.drawImage(this.background_img, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight);
             }
             else if ( this.ypos_img - this.context.height/2 < 0 ) {
+                // Top
+
+                sx = this.xpos_img - this.context.width/2;
+                sy = this.background_height - (this.context.height/2 - this.ypos_img);
+                sWidth = this.context.width;
+                sHeight = this.context.height/2 - this.ypos_img;
+                dx = 0;
+                dy = 0;
+                dWidth = sWidth;
+                dHeight = sHeight;
+                this.context.drawImage(this.background_img, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight);
+
+                sx = this.xpos_img - this.context.width/2;
+                sy = 0;
+                sWidth = this.context.width;
+                sHeight = this.context.height/2 + this.ypos_img;
+                dx = 0;
+                dy = this.context.height - sHeight;
+                dWidth = sWidth;
+                dHeight = sHeight;
+                this.context.drawImage(this.background_img, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight);
             }
             else {
+                // Middle
+
                 sx = this.xpos_img - this.context.width/2;
                 sy = this.ypos_img - this.context.height/2;
                 sWidth = this.context.width;
@@ -278,18 +529,18 @@ function gameCanvas(jq_elem, xpos, ypos, move_speed, max_x, max_y) {
 
         image_info = this.your_dude.character(this.tile_num);
         img = image_info[0].get(0);
-        img_height = image_info[0].height();
-        img_width = image_info[0].width();
+        img_height = image_info[0].height()/2;
+        img_width = image_info[0].width()/2;
 
         if( image_info[1] ) {
             this.context.save();
             this.context.translate(this.context.canvas.width, 0);
             this.context.scale(-1, 1);
-            this.context.drawImage(img, this.context.width/2 - img_width/2, this.context.height/2 - img_height/2);
+            this.context.drawImage(img, this.context.width/2 - img_width/2, this.context.height/2 - img_height/2, img_width, img_height);
             this.context.restore();
         }
         else {
-            this.context.drawImage(img, this.context.width/2 - img_width/2, this.context.height/2 - img_height/2);
+            this.context.drawImage(img, this.context.width/2 - img_width/2, this.context.height/2 - img_height/2, img_width, img_height);
         }
     }
 
