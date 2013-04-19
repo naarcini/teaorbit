@@ -1,3 +1,4 @@
+from random import choice
 
 class GameState(object):
 
@@ -31,17 +32,19 @@ class GameState(object):
         return {'players': players, 'hat': hat}
 
 class Player(object):
+    guy_types = ['guy1', 'guy2', 'guy3']
     def __init__(self, session_id):
         self.id = session_id
         self.position = Position(0, 0)
         self.movement = Movement(0, 0)
+        self.character = choice(self.guy_types)
 
     def move(self, x, y, dx, dy):
         self.position.update(x, y)
         self.movement.update(dx, dy)
 
     def dictify(self):
-        return {'id': self.id, 'position': {'x': self.position.x, 'y': self.position.y}, 'movement': {'dx': self.movement.dx, 'dy': self.movement.dy}}
+        return {'id': self.id, 'position': {'x': self.position.x, 'y': self.position.y}, 'character': self.character, 'movement': {'dx': self.movement.dx, 'dy': self.movement.dy}}
 
 class Hat(object):
     def __init__(self):
