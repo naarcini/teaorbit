@@ -215,11 +215,13 @@ function gameCanvas(jq_elem, xpos, ypos, move_speed, max_x, max_y) {
         // Update and draw other dudes
         for( var i=0; i<this.other_dudes.length; i++ ) {
             this.other_dudes[i] = this.update_dude(this.other_dudes[i], this.test_dude_x, 0, 10, 0, 1);
+            this.draw_dude(this.other_dudes[i]);
         }
 
         // Update and Draw the player - mirror if necessary.
         // dude(player_id, xpos, ypos, dx, dy, move_speed, has_hat)
         this.your_dude = this.update_dude(this.your_dude, this.xpos, this.ypos, this.dx, this.dy, 0);
+        this.draw_dude(this.your_dude);
         /*
         this.your_dude.set_position(this.xpos, this.ypos);
         this.your_dude.set_movement(this.dx, this.dy);
@@ -244,36 +246,67 @@ function gameCanvas(jq_elem, xpos, ypos, move_speed, max_x, max_y) {
     }
 
     this.update_dude = function(dude, xpos, ypos, dx, dy, has_hat) {
-        var image_info, img, img_height, img_width, x_off, y_off;
-
         dude.set_position(xpos, ypos);
         dude.set_movement(dx, dy);
         dude.set_hat_status(has_hat);
 
-        x_off = xpos - this.xpos;
-        x_off = Math.abs(x_off) > this.max_x ? -x_off % this.max_x : x_off;
-        y_off = ypos - this.ypos;
-        y_off = Math.abs(y_off) > this.max_y ? -y_off % this.max_y : y_off;
+        return dude;
+    }
 
-        if( (Math.abs(x_off)) < this.context.width/2 && (Math.abs(y_off)) < this.context.height/2 ) {
-            image_info = dude.character(this.tile_num);
-            img = image_info[0].get(0);
-            img_height = image_info[0].height()/2;
-            img_width = image_info[0].width()/2;
+    this.draw_dude = function(dude) {
+        var image_info, img, img_height, img_width, dude_x, dude_y, x_off, x_off_other, y_off, y_off_other;
+        var draw_locations = new Array();
+        dude_x = dude.get_position()[0];
+        dude_y = dude.get_position()[1];
 
-            if( image_info[1] ) {
-                this.context.save();
-                this.context.translate(this.context.width, 0);
-                this.context.scale(-1, 1);
-                this.context.drawImage(img, this.context.width/2 - img_width/2 - x_off, this.context.height/2 - img_height/2 - y_off, img_width, img_height);
-                this.context.restore();
+        if( false ) {
+            console.log([dude.get_position()[0], dude.get_position()[1], this.xpos, this.ypos]);
+        }
+
+        image_info = dude.character(this.tile_num);
+        img = image_info[0].get(0);
+        img_height = image_info[0].height()/2;
+        img_width = image_info[0].width()/2;
+
+        x_off = (dude_x - this.xpos);
+        x_off_other = x_off < 0 ? (2*this.max_x - Math.abs(x_off)) : (2*this.max_x - x_off)*(-1);
+        x_off_other = (x_off == 0) ? 0 : x_off_other;
+        y_off = (dude_y - this.ypos);
+        y_off_other = y_off < 0 ? (2*this.max_y - Math.abs(y_off)) : (2*this.max_y - y_off)*(-1);
+        y_off_other = (y_off == 0) ? 0 : y_off_other;
+
+        var draw_x, draw_y;
+        if( x_off == 0 && y_off == 0 ) {
+            draw_x = this.context.width/2 - img_width/2;
+            draw_y = this.context.height/2 - img_height/2;
+            draw_locations.push([draw_x, draw_y])
+        }
+        else {
+            if( Math.abs(x_off) < this.context.width/2 && Math.abs(y_off) < this.context.height/2) {
+                draw_x = this.context.width/2 - img_width/2 - x_off;
+                draw_y = this.context.height/2 - img_height/2 - y_off;
+                draw_locations.push([draw_x, draw_y]);
             }
-            else {
-                this.context.drawImage(img, this.context.width/2 - img_width/2 - x_off, this.context.height/2 - img_height/2 - y_off, img_width, img_height);
+            if( Math.abs(x_off_other) < this.context.width/2 && Math.abs(y_off_other) < this.context.height/2) {
+                draw_x = this.context.width/2 - img_width/2 - x_off_other;
+                draw_y = this.context.height/2 - img_height/2 - y_off_other;
+                draw_locations.push([draw_x, draw_y]);
             }
         }
 
-        return dude;
+        for( var i=0; i<draw_locations.length; i++ ) {
+            if( image_info[1] ) {
+                // Mirror the image
+                this.context.save();
+                this.context.translate(this.context.canvas.width, 0);
+                this.context.scale(-1, 1);
+                this.context.drawImage(img, draw_locations[i][0], draw_locations[i][1], img_width, img_height);
+                this.context.restore();
+            }
+            else {
+                this.context.drawImage(img, draw_locations[i][0], draw_locations[i][1], img_width, img_height);
+            }
+        }
     }
 
     this.move_start = function( keyCode ) {
@@ -321,19 +354,18 @@ function gameCanvas(jq_elem, xpos, ypos, move_speed, max_x, max_y) {
     this.update_locations = function() {
         // Actual x and y positions
         this.xpos = this.xpos + this.dx;
-        if( Math.abs(this.xpos) > this.max_x ) {
+        if( Math.abs(this.xpos) >= this.max_x ) {
             this.xpos = this.xpos < 0 ? (this.max_x - Math.abs(this.xpos + this.max_x)) : (Math.abs(this.xpos - this.max_x) - this.max_x);
         }
         this.ypos = this.ypos - this.dy;
-        if( Math.abs(this.ypos) > this.max_y ) {
+        if( Math.abs(this.ypos) >= this.max_y ) {
             this.ypos = this.ypos < 0 ? (this.max_y - Math.abs(this.ypos + this.max_y)) : (Math.abs(this.ypos - this.max_y) - this.max_y);
         }
 
         this.test_dude_x = this.test_dude_x + 10;
-        if( Math.abs(this.test_dude_x) > this.max_x ) {
+        if( Math.abs(this.test_dude_x) >= this.max_x ) {
             this.test_dude_x = this.test_dude_x < 0 ? (this.max_x - Math.abs(this.test_dude_x + this.max_x)) : (Math.abs(this.test_dude_x - this.max_x) - this.max_x);
         }
-        console.log(this.test_dude_x);
 
         // x and y relative to background
         this.xpos_img = (this.xpos_img + this.dx) % this.background_width;
