@@ -19,7 +19,7 @@ class Connection(SockJSConnection):
         self.game_state.add_player(sessid)
 
         self.debug()
-        periodic = ioloop.PeriodicCallback(self.send_state, 1)
+        periodic = ioloop.PeriodicCallback(self.send_state, 50)
         periodic.start()
 
     def on_message(self, text):
