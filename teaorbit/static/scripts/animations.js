@@ -42,6 +42,29 @@ function Canvas(jq_elem) {
     return canvas_jq;
 }
 
+function hat(owner, xpos, ypos) {
+    this.owner = owner;
+    this.xpos = xpos;
+    this.ypos = ypos;
+
+    this.get_position() {
+        return [this.xpos, this.ypos]
+    }
+
+    this.set_position(xpos, ypos) {
+        this.xpos = xpos;
+        this.ypos = ypos;
+    }
+
+    this.get_owner() {
+        return this.owner;
+    }
+
+    this.set_owner(owner) {
+        this.owner = owner;
+    }
+}
+
 function dude(player_id, xpos, ypos, dx, dy, move_speed, has_hat) {
     // Instance variables
     this.player_id = player_id
@@ -222,27 +245,6 @@ function gameCanvas(jq_elem, xpos, ypos, move_speed, max_x, max_y) {
         // dude(player_id, xpos, ypos, dx, dy, move_speed, has_hat)
         this.your_dude = this.update_dude(this.your_dude, this.xpos, this.ypos, this.dx, this.dy, 0);
         this.draw_dude(this.your_dude);
-        /*
-        this.your_dude.set_position(this.xpos, this.ypos);
-        this.your_dude.set_movement(this.dx, this.dy);
-        var image_info, img, img_height, img_width, ctx;
-
-        image_info = this.your_dude.character(this.tile_num);
-        img = image_info[0].get(0);
-        img_height = image_info[0].height()/2;
-        img_width = image_info[0].width()/2;
-
-        if( image_info[1] ) {
-            this.context.save();
-            this.context.translate(this.context.canvas.width, 0);
-            this.context.scale(-1, 1);
-            this.context.drawImage(img, this.context.width/2 - img_width/2, this.context.height/2 - img_height/2, img_width, img_height);
-            this.context.restore();
-        }
-        else {
-            this.context.drawImage(img, this.context.width/2 - img_width/2, this.context.height/2 - img_height/2, img_width, img_height);
-        }
-        */
     }
 
     this.update_dude = function(dude, xpos, ypos, dx, dy, has_hat) {
