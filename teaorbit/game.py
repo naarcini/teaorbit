@@ -24,7 +24,10 @@ class GameState(object):
             self.hat.owner = session_id
 
     def dictify(self):
-        return {'test': 'hello'}
+        players = {}
+        for key, val in self.players.items():
+            players[key] = val.dictify()
+        return {'players': players}
 
 class Player(object):
     def __init__(self, session_id):
@@ -33,6 +36,9 @@ class Player(object):
 
     def move(self, x, y):
         self.position.update(x, y)
+
+    def dictify(self):
+        return {'id': self.id, 'position': {'x': self.position.x, 'y': self.position.y}}
 
 class Hat(object):
     def __init__(self):

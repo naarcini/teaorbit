@@ -10,6 +10,8 @@
         <script type="text/javascript" charset="utf-8" src="{{ STATIC_URL }}scripts/jquery-1.9.1.min.js"></script>
         <script type="text/javascript" charset="utf-8" src="{{ STATIC_URL }}scripts/animframe.js"></script>
         <script type="text/javascript" charset="utf-8" src="{{ STATIC_URL }}scripts/animations.js"></script>
+        <script type="text/javascript" charset="utf-8" src="{{ STATIC_URL }}scripts/sockjs.min.js"></script>
+        <script type="text/javascript" charset="utf-8" src="{{ STATIC_URL }}scripts/network.js"></script>
         <script type="text/javascript">
             var canvas_jq, canvas, ctx, moveID, max_height, max_width, your_dude, other_dudes;
 
@@ -18,28 +20,13 @@
                 $('#hat-game').css('min-width', Math.min($(window).innerWidth(), 1750));
                 
                 canvas = new gameCanvas($('#hat-game'), 0, 0, 10, 1000, 1000);
+                networking = new Networking(canvas);
 
                 $('#game_background').load( function() {
                     canvas.init();
                     canvas.start();
                 });
                 
-/*
-                canvas_jq = new Canvas($('#hat-game'));
-                canvas = canvas_jq.get(0);
-                ctx = canvas.getContext('2d');
-                
-                var img = new Image()
-                img.src = '{{ STATIC_URL }}images/HAT_Background.png';
-                 
-                img.onload = function() {
-                    ctx.drawImage(img, 0, 0);
-                }
-                
-                // Dude initialization
-                your_dude = new dude(250, 250, 5, 15);
-                moveID = window.setInterval( your_dude('move', ctx, width, height), 100 );
-*/
                 $('body').on('keydown', function(e) {
                     var code = e.keyCode || e.which;
                     canvas.move_start(code);
@@ -52,76 +39,6 @@
                 
                 
             });
-/*
-            draw = function() {
-                var canvas = $('#tutorial')[0];
-                // Check for browser support
-                if( canvas.getContext ) {
-                    var ctx = canvas.getContext('2d');
-                    // arc(x, y, radius, startAngle, endAngle, anticlockwise)
-                    // lineTo(x, y)
-                    // closePath()
-
-                    // speechBubble( ctx, 65, 125, 100, 50, 5)
-                    character(ctx, 75, 75);
-                }
-            };
-
-            // Speech bubble that originates from point x, y
-            speechBubble = function( ctx, x, y, width, height, radius ) {
-                var curvy_width = 20;
-                var curvy_height = 20;
-                var curviness = 10;
-
-                // Draw curvy part
-                ctx.beginPath();
-                ctx.moveTo(x, y);
-                ctx.quadraticCurveTo(x+curvy_width/2+curviness, y-curvy_height/2, x, y-curvy_height);
-                ctx.moveTo(x, y);
-                ctx.quadraticCurveTo(x+curvy_width/2+curviness, y-curvy_height/2, x+curvy_height, y-curvy_height);
-                
-                //Draw Rectangular part
-                var rect_x = x + curvy_width/2 - width/2;
-                var rect_y = y - curvy_height - height;
-
-                ctx.moveTo(rect_x, rect_y+radius);
-                ctx.lineTo(rect_x, rect_y+height-radius);
-                ctx.quadraticCurveTo(rect_x, rect_y+height, rect_x+radius, rect_y+height);
-                ctx.lineTo(rect_x+width/2-curvy_width/2, rect_y+height);
-                ctx.moveTo(rect_x+width/2+curvy_width/2, rect_y+height);
-                ctx.lineTo(rect_x+width-radius, rect_y+height);
-                ctx.quadraticCurveTo(rect_x+width, rect_y+height, rect_x+width, rect_y+height-radius);
-                ctx.lineTo(rect_x+width, rect_y+radius);
-                ctx.quadraticCurveTo(rect_x+width, rect_y, rect_x+width-radius, rect_y);
-                ctx.lineTo(rect_x+radius, rect_y);
-                ctx.quadraticCurveTo(rect_x, rect_y, rect_x, rect_y+radius);
-                ctx.stroke();
-            };
-
-            // Character face center is at x, y
-            character = function( ctx, x, y ) {
-                var dude_height = 50;
-                // Draw face
-                ctx.beginPath();
-                ctx.arc(x, y, dude_size, 0, Math.PI*2, true);
-                ctx.stroke();
-            };
-
-            move = function() {
-                ctx.clearRect(0, 0, 500, 500);
-                xpos = xpos + dx;
-                ypos = ypos + dy;
-                if( xpos > 500-dude_size )
-                    xpos = 500-dude_size;
-                if( xpos < dude_size )
-                    xpos = dude_size;
-                if( ypos > 500-dude_size )
-                    ypos = 500-dude_size;
-                if( ypos < dude_size )
-                    ypos = dude_size;
-                character(ctx, xpos, ypos);
-            };
-            */
         </script>
     </head>
     <body>

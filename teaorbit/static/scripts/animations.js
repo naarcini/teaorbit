@@ -168,7 +168,10 @@ function gameCanvas(jq_elem, xpos, ypos, move_speed, max_x, max_y) {
     this.dx = 0;
     this.dy = 0;
     this.move_speed = move_speed;
-    this.test_dude_x = 0;
+    this.other_dudes = {};
+
+    var that = this;
+    this.network = null;
 
     // Methods
     this.init = function() {
@@ -179,28 +182,24 @@ function gameCanvas(jq_elem, xpos, ypos, move_speed, max_x, max_y) {
         this.background_height = this.background.height();
         this.background_width = this.background.width();
         this.background_img = this.background.get(0);
-        /*
-        console.log(this.background);
-        console.log(this.background_width);
-        console.log(this.background_height);
-        console.log(this.background_img);
-        console.log(this.jq_elem);
-        console.log(this.context.width);
-        console.log(this.context.height);
-        */
 
         this.xpos_img = this.background_width/2;
         this.ypos_img = this.background_height/2;
 
         // dude(player_id, xpos, ypos, dx, dy, move_speed, has_hat)
         this.your_dude = new dude("you", this.xpos, this.ypos, this.dx, this.dy, this.move_speed, 0);
-        this.other_dudes = [new dude("not_you", this.test_dude_x, 0, 10, 0, this.move_speed, 1)];
+        //this.other_dudes["not_you"] = new dude("not_you", this.test_dude_x, 0, 10, 0, this.move_speed, 1);
         this.hat_position = null;
 
         this.tile_num = 1;
         this.total_tiles = 2;
         this.frame_counter = 1;
         this.tile_interval = 10;
+
+    }
+
+    this.connect = function(network) {
+        this.network = network;
     }
 
     this.resetGameCanvas = function() {
@@ -215,36 +214,20 @@ function gameCanvas(jq_elem, xpos, ypos, move_speed, max_x, max_y) {
         this.draw_background();
 
         // Update and draw other dudes
-        for( var i=0; i<this.other_dudes.length; i++ ) {
-            this.other_dudes[i] = this.update_dude(this.other_dudes[i], this.test_dude_x, 0, 10, 0, 1);
-            this.draw_dude(this.other_dudes[i]);
-        }
+        $.each(this.other_dudes, function(session_id, dude) {
+            //var dude = that.update_dude(dude, dude.posx, dude.posy, dude.dx, 0, 1);
+            that.draw_dude(dude);
+        });
 
         // Update and Draw the player - mirror if necessary.
         // dude(player_id, xpos, ypos, dx, dy, move_speed, has_hat)
         this.your_dude = this.update_dude(this.your_dude, this.xpos, this.ypos, this.dx, this.dy, 0);
+        var json_message = JSON.stringify({'action': 'move', 'body': {'session': window.session_id, 'x': this.xpos, 'y': this.ypos}});
+        if(this.network != null) {
+            console.log(json_message);
+            this.network.send(json_message);
+        }
         this.draw_dude(this.your_dude);
-        /*
-        this.your_dude.set_position(this.xpos, this.ypos);
-        this.your_dude.set_movement(this.dx, this.dy);
-        var image_info, img, img_height, img_width, ctx;
-
-        image_info = this.your_dude.character(this.tile_num);
-        img = image_info[0].get(0);
-        img_height = image_info[0].height()/2;
-        img_width = image_info[0].width()/2;
-
-        if( image_info[1] ) {
-            this.context.save();
-            this.context.translate(this.context.canvas.width, 0);
-            this.context.scale(-1, 1);
-            this.context.drawImage(img, this.context.width/2 - img_width/2, this.context.height/2 - img_height/2, img_width, img_height);
-            this.context.restore();
-        }
-        else {
-            this.context.drawImage(img, this.context.width/2 - img_width/2, this.context.height/2 - img_height/2, img_width, img_height);
-        }
-        */
     }
 
     this.update_dude = function(dude, xpos, ypos, dx, dy, has_hat) {

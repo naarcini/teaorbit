@@ -19,7 +19,7 @@ class Connection(SockJSConnection):
         self.game_state.add_player(sessid)
 
         self.debug()
-        periodic = ioloop.PeriodicCallback(self.broadcast_state, 1000)
+        periodic = ioloop.PeriodicCallback(self.send_state, 1000)
         periodic.start()
 
     def on_message(self, text):
@@ -27,7 +27,8 @@ class Connection(SockJSConnection):
         if message['action'] == 'move':
             x = message['body']['x']
             y = message['body']['y']
-            self.game_state.players[message['body']['session_id']].position.update(x, y)
+            self.game_state.players[message['body']['session']].position.update(x, y)
+            self.send_obj('ack', {})
 
     def on_close(self):
         sessid = self.session.session_id
@@ -47,5 +48,5 @@ class Connection(SockJSConnection):
         json_message = json.dumps({'action': 'log', 'body': {'message': text}})
         self.broadcast(self.participants, json_message)
 
-    def broadcast_state(self):
+    def send_state(self):
         self.send_obj('state', self.game_state.dictify())
