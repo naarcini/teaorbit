@@ -23,8 +23,6 @@ function Networking(game) {
             var hat_owner = state.hat.owner;
             that.game.hat.set_owner(hat_owner);
             that.game.hat.set_position(state.hat.x, state.hat.y);
-            console.log(that.game.hat.get_owner());
-            console.log(that.game.hat.get_position());
 
             // update positions of existing players
             $.each(state.players, function(session, player) {
