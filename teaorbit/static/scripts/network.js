@@ -23,8 +23,6 @@ function Networking(game) {
             var hat_owner = state.hat.owner;
             that.game.hat.set_owner(hat_owner);
             that.game.hat.set_position(state.hat.x, state.hat.y);
-            console.log(that.game.hat.get_owner());
-            console.log(that.game.hat.get_position());
 
             // update positions of existing players
             $.each(state.players, function(session, player) {
@@ -33,7 +31,10 @@ function Networking(game) {
                         var has_hat = (hat_owner == session);
                         that.game.update_dude(that.game.other_dudes[session], player.position.x, player.position.y, player.movement.dx, player.movement.dy, has_hat);
                     } else {
-                        that.game.other_dudes[session] = new dude(session, 0, 0, 0, 0, that.game.move_speed, 0);
+                        var min = 1;
+                        var max = 3;
+                        var random = Math.floor(Math.random() * (max - min + 1)) + min;
+                        that.game.other_dudes[session] = new dude(session, 0, 0, 0, 0, that.game.move_speed, 0, random);
                         console.log('Added player ' + session);
                     }
                 }

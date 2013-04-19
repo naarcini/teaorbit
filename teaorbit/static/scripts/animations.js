@@ -76,7 +76,7 @@ function Hat(owner, xpos, ypos) {
     }
 }
 
-function dude(player_id, xpos, ypos, dx, dy, move_speed, has_hat) {
+function dude(player_id, xpos, ypos, dx, dy, move_speed, has_hat, guy) {
     // Instance variables
     this.player_id = player_id;
     this.xpos = xpos;
@@ -85,7 +85,7 @@ function dude(player_id, xpos, ypos, dx, dy, move_speed, has_hat) {
     this.dy = dy;
     this.move_speed = move_speed;
     this.has_hat = has_hat;
-    this.guy = 1;
+    this.guy = guy;
 
     // Methods
     this.get_image = function( tile_num ) {
@@ -217,7 +217,7 @@ function gameCanvas(jq_elem, xpos, ypos, move_speed, max_x, max_y) {
         this.ypos_img = this.background_height/2;
 
         // dude(player_id, xpos, ypos, dx, dy, move_speed, has_hat)
-        this.your_dude = new dude("you", this.xpos, this.ypos, this.dx, this.dy, this.move_speed, 0);
+        this.your_dude = new dude("you", this.xpos, this.ypos, this.dx, this.dy, this.move_speed, 0, 1);
         //this.other_dudes["not_you"] = new dude("not_you", this.test_dude_x, 0, 10, 0, this.move_speed, 1);
         this.hat = new Hat(null, 700, 700);
 
