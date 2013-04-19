@@ -14,20 +14,21 @@ class GameState(object):
     def remove_player(self, session_id):
         if self.hat.owner == session_id:
             self.hat.owner = None
-            self.hat.position = players[session_id].position
+            self.hat.position.update(self.players[session_id].position.x, self.players[session_id].position.y)
         del self.players[session_id]
 
     def assign_hat(self, session_id):
         if self.hat.owner is not None:
-            raise Exception('Hat is already being worn')
+            raise KeyError('Hat is already being worn')
         else:
             self.hat.owner = session_id
 
     def dictify(self):
         players = {}
+        hat = {'owner': self.hat.owner, 'x': self.hat.position.x, 'y': self.hat.position.y}
         for key, val in self.players.items():
             players[key] = val.dictify()
-        return {'players': players}
+        return {'players': players, 'hat': hat}
 
 class Player(object):
     def __init__(self, session_id):
@@ -37,14 +38,14 @@ class Player(object):
 
     def move(self, x, y, dx, dy):
         self.position.update(x, y)
-        self.Movement.update(dx, dy)
+        self.movement.update(dx, dy)
 
     def dictify(self):
         return {'id': self.id, 'position': {'x': self.position.x, 'y': self.position.y}, 'movement': {'dx': self.movement.dx, 'dy': self.movement.dy}}
 
 class Hat(object):
     def __init__(self):
-        self.position = Position(0, 0)
+        self.position = Position(700, 700)
         self.owner = None
 
 class Position(object):

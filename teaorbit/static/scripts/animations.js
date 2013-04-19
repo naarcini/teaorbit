@@ -44,10 +44,14 @@ function Canvas(jq_elem) {
     return canvas_jq;
 }
 
-function hat(owner, xpos, ypos) {
+function Hat(owner, xpos, ypos) {
     this.owner = owner;
     this.xpos = xpos;
     this.ypos = ypos;
+
+    this.get_image = function( tile_num ) {
+        return $('#Hat_pic');
+    }
 
     this.get_position = function() {
         return [this.xpos, this.ypos];
@@ -63,13 +67,18 @@ function hat(owner, xpos, ypos) {
     }
 
     this.set_owner = function(owner) {
-        this.owner = owner;
+        if( !owner ) {
+            this.owner = null;
+        }
+        else {
+            this.owner = owner;
+        }
     }
 }
 
 function dude(player_id, xpos, ypos, dx, dy, move_speed, has_hat) {
     // Instance variables
-    this.player_id = player_id
+    this.player_id = player_id;
     this.xpos = xpos;
     this.ypos = ypos;
     this.dx = dx;
@@ -82,7 +91,6 @@ function dude(player_id, xpos, ypos, dx, dy, move_speed, has_hat) {
     this.get_image = function( tile_num ) {
         var img = null;
         var selector = null;
-        var mirror = false;
         var hat_text = this.has_hat ? 'HAT_' : '';
         var guy_text = this.guy.toString();
         var tile_text = tile_num.toString();
@@ -211,7 +219,7 @@ function gameCanvas(jq_elem, xpos, ypos, move_speed, max_x, max_y) {
         // dude(player_id, xpos, ypos, dx, dy, move_speed, has_hat)
         this.your_dude = new dude("you", this.xpos, this.ypos, this.dx, this.dy, this.move_speed, 0);
         //this.other_dudes["not_you"] = new dude("not_you", this.test_dude_x, 0, 10, 0, this.move_speed, 1);
-        this.hat_position = null;
+        this.hat = new Hat(null, 700, 700);
 
         this.tile_num = 1;
         this.total_tiles = 2;
@@ -235,23 +243,68 @@ function gameCanvas(jq_elem, xpos, ypos, move_speed, max_x, max_y) {
         // Draw background - Wrap around if too big
         this.draw_background();
 
+        // Update player
+        this.your_dude = this.update_dude(this.your_dude, this.xpos, this.ypos, this.dx, this.dy, this.your_dude.get_hat_status());
+
         // Update and draw other dudes
         $.each(this.other_dudes, function(session_id, dude) {
             //var dude = that.update_dude(dude, dude.posx, dude.posy, dude.dx, 0, 1);
-            that.draw_dude(dude);
+            that.draw_object(dude);
         });
 
-        // Update and Draw the player - mirror if necessary.
-        // dude(player_id, xpos, ypos, dx, dy, move_speed, has_hat)
-        this.your_dude = this.update_dude(this.your_dude, this.xpos, this.ypos, this.dx, this.dy, 0);
+        // Update and draw hat
+        this.update_hat();
 
-        var json_message = JSON.stringify({'action': 'move', 'body': {'session': window.session_id, 'x': this.xpos, 'y': this.ypos, 'dx': this.dx, 'dy': this.dy}});
+        // Send information
+        var json_message = JSON.stringify({'action': 'move', 'body': {'session': window.session_id, 'x': this.xpos, 'y': this.ypos, 'dx': this.dx, 'dy': this.dy, 'hat_owner': this.your_dude.get_hat_status()}});
         if(this.network !== null) {
             //console.log(json_message);
             this.network.send(json_message);
         }
 
-        this.draw_dude(this.your_dude);
+        // Draw player
+        this.draw_object(this.your_dude);
+
+    }
+
+    this.set_hat_owner = function(owner) {
+        this.hat.set_owner(owner);
+    }
+
+    this.update_hat = function() {
+        var image_jq, img, img_height, img_width, x_off, x_off_other, y_off, y_off_other, hat_x, hat_y;
+
+        if( !this.hat.get_owner() ) {
+            hat_x = this.hat.get_position()[0];
+            hat_y = this.hat.get_position()[1];
+
+            image_jq = this.hat.get_image(this.tile_num);
+            img = image_jq.get(0);
+            img_height = image_jq.height()/2;
+            img_width = image_jq.width()/2;
+
+            x_off = (hat_x - this.xpos);
+            x_off_other = x_off < 0 ? (2*this.max_x - Math.abs(x_off)) : (2*this.max_x - x_off)*(-1);
+            x_off_other = (x_off == 0) ? 0 : x_off_other;
+            y_off = (hat_y - this.ypos);
+            y_off_other = y_off < 0 ? (2*this.max_y - Math.abs(y_off)) : (2*this.max_y - y_off)*(-1);
+            y_off_other = (y_off == 0) ? 0 : y_off_other;
+
+            if( (Math.abs(x_off) < 50 || Math.abs(x_off_other) < 50) && (Math.abs(y_off) < 50 || Math.abs(y_off_other) < 50) ) {
+                this.hat.set_owner(window.session_id);
+                this.your_dude.set_hat_status(1);
+            }
+        }
+        else if ( this.hat.get_owner() != window.session_id ){
+            this.your_dude.set_hat_status(0);
+        }
+        else {
+            this.hat.set_position(this.your_dude.get_position()[0], this.your_dude.get_position()[1]);
+        }
+
+        if( !this.hat.get_owner() ) {
+            this.draw_object(this.hat);
+        }
     }
 
     this.update_dude = function(dude, xpos, ypos, dx, dy, has_hat) {
@@ -262,25 +315,25 @@ function gameCanvas(jq_elem, xpos, ypos, move_speed, max_x, max_y) {
         return dude;
     }
 
-    this.draw_dude = function(dude, obj) {
-        var image_jq, img, img_height, img_width, dude_x, dude_y, x_off, x_off_other, y_off, y_off_other;
+    this.draw_object = function(object) {
+        var image_jq, img, img_height, img_width, obj_x, obj_y, x_off, x_off_other, y_off, y_off_other;
         var draw_locations = new Array();
-        dude_x = dude.get_position()[0];
-        dude_y = dude.get_position()[1];
+        obj_x = object.get_position()[0];
+        obj_y = object.get_position()[1];
 
         if( false ) {
-            console.log([dude.get_position()[0], dude.get_position()[1], this.xpos, this.ypos]);
+            console.log([object.get_position()[0], object.get_position()[1], this.xpos, this.ypos]);
         }
 
-        image_jq = dude.get_image(this.tile_num);
+        image_jq = object.get_image(this.tile_num);
         img = image_jq.get(0);
         img_height = image_jq.height()/2;
         img_width = image_jq.width()/2;
 
-        x_off = (dude_x - this.xpos);
+        x_off = (obj_x - this.xpos);
         x_off_other = x_off < 0 ? (2*this.max_x - Math.abs(x_off)) : (2*this.max_x - x_off)*(-1);
         x_off_other = (x_off == 0) ? 0 : x_off_other;
-        y_off = (dude_y - this.ypos);
+        y_off = (obj_y - this.ypos);
         y_off_other = y_off < 0 ? (2*this.max_y - Math.abs(y_off)) : (2*this.max_y - y_off)*(-1);
         y_off_other = (y_off == 0) ? 0 : y_off_other;
 

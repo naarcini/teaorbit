@@ -25,12 +25,21 @@ class Connection(SockJSConnection):
     def on_message(self, text):
         message = json.loads(text)
         if message['action'] == 'move':
+            player = message['body']['session']
             x = message['body']['x']
             y = message['body']['y']
             dx = message['body']['dx']
             dy = message['body']['dy']
-            self.game_state.players[message['body']['session']].position.update(x, y)
-            self.game_state.players[message['body']['session']].movement.update(dx, dy)
+            hat_owner = int(message['body']['hat_owner'])
+
+            self.game_state.players[player].position.update(x, y)
+            self.game_state.players[player].movement.update(dx, dy)
+            if hat_owner:
+                try:
+                    self.game_state.assign_hat(player);
+                except KeyError:
+                    pass
+
             self.send_obj('ack', {})
 
     def on_close(self):

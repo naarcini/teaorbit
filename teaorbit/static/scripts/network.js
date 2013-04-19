@@ -20,20 +20,31 @@ function Networking(game) {
         // game state
         if(message.action == 'state') {
             var state = message.body;
+            var hat_owner = state.hat.owner;
+            that.game.hat.set_owner(hat_owner);
+            that.game.hat.set_position(state.hat.x, state.hat.y);
+            console.log(that.game.hat.get_owner());
+            console.log(that.game.hat.get_position());
+
             // update positions of existing players
             $.each(state.players, function(session, player) {
                 if(session != window.session_id) {
                     if(session in that.game.other_dudes && that.game.other_dudes[session]) {
-                        that.game.update_dude(that.game.other_dudes[session], player.position.x, player.position.y, player.movement.dx, player.movement.dy, 0);
+                        var has_hat = (hat_owner == session);
+                        that.game.update_dude(that.game.other_dudes[session], player.position.x, player.position.y, player.movement.dx, player.movement.dy, has_hat);
                     } else {
                         that.game.other_dudes[session] = new dude(session, 0, 0, 0, 0, that.game.move_speed, 0);
                         console.log('Added player ' + session);
                     }
                 }
             });
+
             // delete players that left
             $.each(that.game.other_dudes, function(session, player) {
                 if(!(session in state.players)) {
+                    if( hat_owner == session ) {
+                        that.game.hat.set_owner(0);
+                    }
                     delete that.game.other_dudes[session];
                 }
             });
