@@ -27,6 +27,8 @@ function setCanvasSize(canvas_jq, width, height) {
         context.scale(ratio, ratio);
     }
 
+    pixelRatio = ratio;
+
 }
     
 function Canvas(jq_elem) {
@@ -298,7 +300,7 @@ function gameCanvas(jq_elem, xpos, ypos, move_speed, max_x, max_y) {
             if( image_info[1] ) {
                 // Mirror the image
                 this.context.save();
-                this.context.translate(this.context.canvas.width, 0);
+                this.context.translate(this.context.canvas.width/pixelRatio, 0);
                 this.context.scale(-1, 1);
                 this.context.drawImage(img, draw_locations[i][0], draw_locations[i][1], img_width, img_height);
                 this.context.restore();
