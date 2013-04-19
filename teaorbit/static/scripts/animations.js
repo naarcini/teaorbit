@@ -201,7 +201,8 @@ function gameCanvas(jq_elem, xpos, ypos, move_speed, max_x, max_y) {
     this.other_dudes = {};
 
     var that = this;
-    this.network = null;
+    this.network = null
+    this.hat = new Hat(null, 700, 700);
 
     // Methods
     this.init = function() {
@@ -219,7 +220,7 @@ function gameCanvas(jq_elem, xpos, ypos, move_speed, max_x, max_y) {
         // dude(player_id, xpos, ypos, dx, dy, move_speed, has_hat)
         this.your_dude = new dude("you", this.xpos, this.ypos, this.dx, this.dy, this.move_speed, 0, 1);
         //this.other_dudes["not_you"] = new dude("not_you", this.test_dude_x, 0, 10, 0, this.move_speed, 1);
-        this.hat = new Hat(null, 700, 700);
+        //this.hat = new Hat(null, 700, 700);
 
         this.tile_num = 1;
         this.total_tiles = 2;

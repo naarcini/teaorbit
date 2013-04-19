@@ -5,7 +5,9 @@
             Wear a Hat!
         </title>
         <style type="text/css">
-            html, body { margin: 0; padding: 0; }
+            html, body { margin: 0; padding: 0; position: relative; height: 100%; width: 100%; }
+            #intro { height: 100%; width: 100%; background: #000; text-align: center; }
+            #intro img { text-align: center; display: inline-block; height: 100%; background: #000; cursor: pointer; }
         </style>
         <script type="text/javascript" charset="utf-8" src="{{ STATIC_URL }}scripts/jquery-1.9.1.min.js"></script>
         <script type="text/javascript" charset="utf-8" src="{{ STATIC_URL }}scripts/animframe.js"></script>
@@ -16,25 +18,31 @@
             var canvas_jq, canvas, ctx, moveID, max_height, max_width, your_dude, other_dudes;
 
             $(document).ready( function () {
-                $('#hat-game').css('min-height', Math.min($(window).innerHeight(), 1250));
-                $('#hat-game').css('min-width', Math.min($(window).innerWidth(), 1750));
-                
-                canvas = new gameCanvas($('#hat-game'), 0, 0, 10, 1000, 1000);
-                networking = new Networking(canvas);
+                var intro = $('<div>').attr('id', 'intro').append($('<img>').attr('src', '{{ STATIC_URL }}images/WAH_TITLE_MOCKUP.jpg'));
+                $('body').append(intro);
 
-                $('#game_background').load( function() {
-                    canvas.init();
-                    canvas.start();
-                });
-                
-                $('body').on('keydown', function(e) {
-                    var code = e.keyCode || e.which;
-                    canvas.move_start(code);
-                });
+                intro.on('click', function(e) {
+                    $(intro).hide();
+                    $('#hat-game').css('min-height', Math.min($(window).innerHeight(), 1250));
+                    $('#hat-game').css('min-width', Math.min($(window).innerWidth(), 1750));
+                    
+                    canvas = new gameCanvas($('#hat-game'), 0, 0, 10, 1000, 1000);
+                    networking = new Networking(canvas);
 
-                $('body').on('keyup', function(e) {
-                    var code = e.keyCode || e.which;
-                    canvas.move_stop(code);
+                    //$('#game_background').load( function() {
+                        canvas.init();
+                        canvas.start();
+                    //});
+                    
+                    $('body').on('keydown', function(e) {
+                        var code = e.keyCode || e.which;
+                        canvas.move_start(code);
+                    });
+
+                    $('body').on('keyup', function(e) {
+                        var code = e.keyCode || e.which;
+                        canvas.move_stop(code);
+                    });
                 });
                 
                 
