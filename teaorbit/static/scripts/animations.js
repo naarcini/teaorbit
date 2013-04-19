@@ -223,8 +223,8 @@ function gameCanvas(jq_elem, xpos, ypos, move_speed, max_x, max_y) {
         // dude(player_id, xpos, ypos, dx, dy, move_speed, has_hat)
         this.your_dude = this.update_dude(this.your_dude, this.xpos, this.ypos, this.dx, this.dy, 0);
         var json_message = JSON.stringify({'action': 'move', 'body': {'session': window.session_id, 'x': this.xpos, 'y': this.ypos}});
-        if(this.network != null) {
-            console.log(json_message);
+        if(this.network !== null) {
+            //console.log(json_message);
             this.network.send(json_message);
         }
         this.draw_dude(this.your_dude);
