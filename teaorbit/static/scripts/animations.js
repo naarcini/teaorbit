@@ -27,6 +27,8 @@ function setCanvasSize(canvas_jq, width, height) {
         context.scale(ratio, ratio);
     }
 
+    pixelRatio = ratio;
+
 }
     
 function Canvas(jq_elem) {
@@ -47,20 +49,20 @@ function hat(owner, xpos, ypos) {
     this.xpos = xpos;
     this.ypos = ypos;
 
-    this.get_position() {
-        return [this.xpos, this.ypos]
+    this.get_position = function() {
+        return [this.xpos, this.ypos];
     }
 
-    this.set_position(xpos, ypos) {
+    this.set_position = function(xpos, ypos) {
         this.xpos = xpos;
         this.ypos = ypos;
     }
 
-    this.get_owner() {
+    this.get_owner = function() {
         return this.owner;
     }
 
-    this.set_owner(owner) {
+    this.set_owner = function(owner) {
         this.owner = owner;
     }
 }
@@ -77,7 +79,7 @@ function dude(player_id, xpos, ypos, dx, dy, move_speed, has_hat) {
     this.guy = 1;
 
     // Methods
-    this.character = function( tile_num ) {
+    this.get_image = function( tile_num ) {
         var img = null;
         var selector = null;
         var mirror = false;
@@ -89,11 +91,10 @@ function dude(player_id, xpos, ypos, dx, dy, move_speed, has_hat) {
         }
 
         if( this.dx > 0 ) {
-            selector = 'GUY'+guy_text+'_WALK_SIDE_'+hat_text+tile_text;
-            mirror = true;
+            selector = 'GUY'+guy_text+'_WALK_RIGHT_'+hat_text+tile_text;
         }
         else if( this.dx < 0) {
-            selector = 'GUY'+guy_text+'_WALK_SIDE_'+hat_text+tile_text
+            selector = 'GUY'+guy_text+'_WALK_LEFT_'+hat_text+tile_text
         }
         else if( this.dy > 0 ) {
             selector = 'GUY'+guy_text+'_WALK_FRONT_'+hat_text+tile_text;
@@ -106,7 +107,7 @@ function dude(player_id, xpos, ypos, dx, dy, move_speed, has_hat) {
         }
 
         img = $('#'+selector);
-        return [img, mirror];
+        return img;
     }
 
     this.get_player = function() {
@@ -189,7 +190,10 @@ function gameCanvas(jq_elem, xpos, ypos, move_speed, max_x, max_y) {
     this.dx = 0;
     this.dy = 0;
     this.move_speed = move_speed;
-    this.test_dude_x = 0;
+    this.other_dudes = {};
+
+    var that = this;
+    this.network = null;
 
     // Methods
     this.init = function() {
@@ -200,28 +204,24 @@ function gameCanvas(jq_elem, xpos, ypos, move_speed, max_x, max_y) {
         this.background_height = this.background.height();
         this.background_width = this.background.width();
         this.background_img = this.background.get(0);
-        /*
-        console.log(this.background);
-        console.log(this.background_width);
-        console.log(this.background_height);
-        console.log(this.background_img);
-        console.log(this.jq_elem);
-        console.log(this.context.width);
-        console.log(this.context.height);
-        */
 
         this.xpos_img = this.background_width/2;
         this.ypos_img = this.background_height/2;
 
         // dude(player_id, xpos, ypos, dx, dy, move_speed, has_hat)
         this.your_dude = new dude("you", this.xpos, this.ypos, this.dx, this.dy, this.move_speed, 0);
-        this.other_dudes = [new dude("not_you", this.test_dude_x, 0, 10, 0, this.move_speed, 1)];
+        //this.other_dudes["not_you"] = new dude("not_you", this.test_dude_x, 0, 10, 0, this.move_speed, 1);
         this.hat_position = null;
 
         this.tile_num = 1;
         this.total_tiles = 2;
         this.frame_counter = 1;
         this.tile_interval = 10;
+
+    }
+
+    this.connect = function(network) {
+        this.network = network;
     }
 
     this.resetGameCanvas = function() {
@@ -236,14 +236,21 @@ function gameCanvas(jq_elem, xpos, ypos, move_speed, max_x, max_y) {
         this.draw_background();
 
         // Update and draw other dudes
-        for( var i=0; i<this.other_dudes.length; i++ ) {
-            this.other_dudes[i] = this.update_dude(this.other_dudes[i], this.test_dude_x, 0, 10, 0, 1);
-            this.draw_dude(this.other_dudes[i]);
-        }
+        $.each(this.other_dudes, function(session_id, dude) {
+            //var dude = that.update_dude(dude, dude.posx, dude.posy, dude.dx, 0, 1);
+            that.draw_dude(dude);
+        });
 
         // Update and Draw the player - mirror if necessary.
         // dude(player_id, xpos, ypos, dx, dy, move_speed, has_hat)
         this.your_dude = this.update_dude(this.your_dude, this.xpos, this.ypos, this.dx, this.dy, 0);
+
+        var json_message = JSON.stringify({'action': 'move', 'body': {'session': window.session_id, 'x': this.xpos, 'y': this.ypos, 'dx': this.dx, 'dy': this.dy}});
+        if(this.network !== null) {
+            //console.log(json_message);
+            this.network.send(json_message);
+        }
+
         this.draw_dude(this.your_dude);
     }
 
@@ -255,8 +262,8 @@ function gameCanvas(jq_elem, xpos, ypos, move_speed, max_x, max_y) {
         return dude;
     }
 
-    this.draw_dude = function(dude) {
-        var image_info, img, img_height, img_width, dude_x, dude_y, x_off, x_off_other, y_off, y_off_other;
+    this.draw_dude = function(dude, obj) {
+        var image_jq, img, img_height, img_width, dude_x, dude_y, x_off, x_off_other, y_off, y_off_other;
         var draw_locations = new Array();
         dude_x = dude.get_position()[0];
         dude_y = dude.get_position()[1];
@@ -265,10 +272,10 @@ function gameCanvas(jq_elem, xpos, ypos, move_speed, max_x, max_y) {
             console.log([dude.get_position()[0], dude.get_position()[1], this.xpos, this.ypos]);
         }
 
-        image_info = dude.character(this.tile_num);
-        img = image_info[0].get(0);
-        img_height = image_info[0].height()/2;
-        img_width = image_info[0].width()/2;
+        image_jq = dude.get_image(this.tile_num);
+        img = image_jq.get(0);
+        img_height = image_jq.height()/2;
+        img_width = image_jq.width()/2;
 
         x_off = (dude_x - this.xpos);
         x_off_other = x_off < 0 ? (2*this.max_x - Math.abs(x_off)) : (2*this.max_x - x_off)*(-1);
@@ -285,29 +292,19 @@ function gameCanvas(jq_elem, xpos, ypos, move_speed, max_x, max_y) {
         }
         else {
             if( Math.abs(x_off) < this.context.width/2 && Math.abs(y_off) < this.context.height/2) {
-                draw_x = this.context.width/2 - img_width/2 - x_off;
+                draw_x = this.context.width/2 - img_width/2 + x_off;
                 draw_y = this.context.height/2 - img_height/2 - y_off;
                 draw_locations.push([draw_x, draw_y]);
             }
             if( Math.abs(x_off_other) < this.context.width/2 && Math.abs(y_off_other) < this.context.height/2) {
-                draw_x = this.context.width/2 - img_width/2 - x_off_other;
+                draw_x = this.context.width/2 - img_width/2 + x_off_other;
                 draw_y = this.context.height/2 - img_height/2 - y_off_other;
                 draw_locations.push([draw_x, draw_y]);
             }
         }
 
         for( var i=0; i<draw_locations.length; i++ ) {
-            if( image_info[1] ) {
-                // Mirror the image
-                this.context.save();
-                this.context.translate(this.context.canvas.width, 0);
-                this.context.scale(-1, 1);
-                this.context.drawImage(img, draw_locations[i][0], draw_locations[i][1], img_width, img_height);
-                this.context.restore();
-            }
-            else {
-                this.context.drawImage(img, draw_locations[i][0], draw_locations[i][1], img_width, img_height);
-            }
+            this.context.drawImage(img, draw_locations[i][0], draw_locations[i][1], img_width, img_height);
         }
     }
 
@@ -362,11 +359,6 @@ function gameCanvas(jq_elem, xpos, ypos, move_speed, max_x, max_y) {
         this.ypos = this.ypos - this.dy;
         if( Math.abs(this.ypos) >= this.max_y ) {
             this.ypos = this.ypos < 0 ? (this.max_y - Math.abs(this.ypos + this.max_y)) : (Math.abs(this.ypos - this.max_y) - this.max_y);
-        }
-
-        this.test_dude_x = this.test_dude_x + 10;
-        if( Math.abs(this.test_dude_x) >= this.max_x ) {
-            this.test_dude_x = this.test_dude_x < 0 ? (this.max_x - Math.abs(this.test_dude_x + this.max_x)) : (Math.abs(this.test_dude_x - this.max_x) - this.max_x);
         }
 
         // x and y relative to background
