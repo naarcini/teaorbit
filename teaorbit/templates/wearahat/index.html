@@ -15,7 +15,7 @@
         <script type="text/javascript" charset="utf-8" src="{{ STATIC_URL }}scripts/sockjs.min.js"></script>
         <script type="text/javascript" charset="utf-8" src="{{ STATIC_URL }}scripts/network.js"></script>
         <script type="text/javascript">
-            var canvas_jq, canvas, ctx, moveID, max_height, max_width, your_dude, other_dudes;
+            var canvas, networking;
 
             $(document).ready( function () {
                 var intro = $('<div>').attr('id', 'intro').append($('<img>').attr('src', '{{ STATIC_URL }}images/WAH_TITLE_MOCKUP.jpg'));

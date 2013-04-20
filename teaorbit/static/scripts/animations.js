@@ -148,6 +148,14 @@ function dude(player_id, xpos, ypos, dx, dy, move_speed, has_hat, guy) {
         this.has_hat = has_hat;
     }
 
+    this.set_guy = function(guy) {
+        this.guy = guy;
+    }
+
+    this.get_guy = function() {
+        return this.guy;
+    }
+
 /*
     talk = function( ctx, width, height, text ) {
         var x = xpos + dude_size + 5;
@@ -245,7 +253,7 @@ function gameCanvas(jq_elem, xpos, ypos, move_speed, max_x, max_y) {
         this.draw_background();
 
         // Update player
-        this.your_dude = this.update_dude(this.your_dude, this.xpos, this.ypos, this.dx, this.dy, this.your_dude.get_hat_status());
+        this.your_dude = this.update_dude(this.your_dude, this.xpos, this.ypos, this.dx, this.dy, this.your_dude.get_hat_status(), this.your_dude.get_guy());
 
         // Update and draw other dudes
         $.each(this.other_dudes, function(session_id, dude) {
@@ -308,10 +316,11 @@ function gameCanvas(jq_elem, xpos, ypos, move_speed, max_x, max_y) {
         }
     }
 
-    this.update_dude = function(dude, xpos, ypos, dx, dy, has_hat) {
+    this.update_dude = function(dude, xpos, ypos, dx, dy, has_hat, guy) {
         dude.set_position(xpos, ypos);
         dude.set_movement(dx, dy);
         dude.set_hat_status(has_hat);
+        dude.set_guy(guy);
 
         return dude;
     }

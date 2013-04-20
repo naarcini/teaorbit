@@ -32,7 +32,7 @@ class GameState(object):
         return {'players': players, 'hat': hat}
 
 class Player(object):
-    guy_types = ['guy1', 'guy2', 'guy3']
+    guy_types = [1, 2, 3]
     def __init__(self, session_id):
         self.id = session_id
         self.position = Position(0, 0)
