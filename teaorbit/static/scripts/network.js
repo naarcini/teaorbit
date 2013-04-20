@@ -36,7 +36,7 @@ function Networking(game) {
                     }
                 }
                 else {
-                    that.game.update_dude(that.game.your_dude, player.position.x, player.position.y, player.movement.dx, player.movement.dy, has_hat, player.character);
+                    that.game.update_dude(that.game.your_dude, player.position.x, player.position.y, player.movement.dx, player.movement.dy, that.game.your_dude.get_hat_status(), player.character);
                 }
             });
 
