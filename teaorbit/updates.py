@@ -30,7 +30,9 @@ class Connection(SockJSConnection):
             y = message['body']['y']
             dx = message['body']['dx']
             dy = message['body']['dy']
-            hat_owner = int(message['body']['hat_owner'])
+            hat_owner = 0
+            if message['body'].has_key('hat_owner'):
+                hat_owner = int(message['body']['hat_owner'])
 
             self.game_state.players[player].position.update(x, y)
             self.game_state.players[player].movement.update(dx, dy)

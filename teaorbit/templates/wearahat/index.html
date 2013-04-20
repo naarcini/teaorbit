@@ -13,16 +13,16 @@
         <script type="text/javascript" charset="utf-8" src="{{ STATIC_URL }}scripts/sockjs.min.js"></script>
         <script type="text/javascript" charset="utf-8" src="{{ STATIC_URL }}scripts/network.js"></script>
         <script type="text/javascript">
-            var canvas_jq, canvas, ctx, moveID, max_height, max_width, your_dude, other_dudes;
+            var canvas, networking;
 
             $(document).ready( function () {
                 $('#hat-game').css('min-height', Math.min($(window).innerHeight(), 1250));
                 $('#hat-game').css('min-width', Math.min($(window).innerWidth(), 1750));
                 
                 canvas = new gameCanvas($('#hat-game'), 0, 0, 10, 1000, 1000);
-                networking = new Networking(canvas);
 
                 $('#game_background').load( function() {
+                    networking = new Networking(canvas);
                     canvas.init();
                     canvas.start();
                 });
